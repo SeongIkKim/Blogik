@@ -61,6 +61,10 @@ function SEO({ description, lang, meta, title }) {
             name: `twitter:description`,
             content: metaDescription,
           },
+          {
+            name: `google-site-verification`,
+            content: `ri8BhifS4FanGjMGpVM61CIOgGI1bpZFDlee6ZVEFvU`,
+          }
         ].concat(meta)}
       />
       <Helmet>
