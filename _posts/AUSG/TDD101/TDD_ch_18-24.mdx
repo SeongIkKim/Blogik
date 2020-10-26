@@ -1,0 +1,1030 @@
+---
+title: 테스트 주도 개발 ch 18-24
+date: 2020-10-26
+tags: [AUSG, TDD]
+excerpt: Test-Driven Development:By Example 2부
+---
+
+
+본 글은 켄트 백의 <테스트 주도 개발>을 읽고 개인적으로 정리한 내용입니다. 내용에 오류가 있을 시 지적해주시면 감사하겠습니다.
+
+
+
+# 18장 xUnit으로 가는 첫 걸음
+
+#
+
+2부는 그나마 익숙한 파이썬으로 들어왔기 때문에, 의식의 흐름대로 따라가는것이 아니라 한 장마다 테스트코드를 정리하고, 코멘트를 달아볼 것이다.
+
+#
+
+2부의 주제는 jUnit을 본딴 xUnit, 즉 테스트툴을 직접 만들어보는 것이다. 그것도 TDD로. 이에 따른 할 일 목록을 정리해본다.
+
+#
+
+> **○ 테스트 메서드 호출하기**
+>
+> ○ 먼저 setUp 호출하기
+>
+> ○ 나중에 tearDown 호출하기
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ○ 여러 개의 테스트 실행하기
+>
+> ○ 수집된 결과를 출력하기
+
+#
+
+이 todo-list를 매번 정리하면서 느끼는 점은, 저자 머릿속에는 저 목록들이 뭘 의미하는지 정리되어 있지만, 독자들은 저걸 한눈에 파악하기 힘들다는 것이다. 나만 그런건지는 모르겠는데, 적어놓은 todo-list들은 한 개씩 각 장에서 '격파(!)'한다는 느낌으로 그 때 그 때 이해할 수 밖에 없다.
+
+
+
+고로 스트레스 받지 말고 그냥 그런가보다 하고 의식의 흐름을 따라 코딩해보자. 지나고 보면 다 맞는말이긴 하다. ~~개똥같이 말하긴 하지만.(...)~~
+
+#
+
+테스트케이스를 실행할 때, 그에 알맞은 테스트메서드가 제대로 호출되었는지를 확인하는 것은 중요하다. 호출을 기록해두는 클래스로 WasRun을 만들기로 한다. 또, 호출부를 하드코딩하는것이 아니라 메서드 추출하여 반복사용할 수 있는 TestCaseTest 클래스를 만들어준다.
+
+#
+
+```python
+class TestCase:
+    def __init__(self, name):
+        self.name = name
+
+    def run(self):
+        '''
+        메서드 동적 호출
+        getattr(object, name, default)는 object 내에서 주어진 string(name)과 동일한 method를 반환해준다.
+        따라서 테스트케이스의 이름을 전달했을 때, 해당 테스트케이스가 호출되었는지를 기록할 수 있다.
+        '''
+        method = getattr(self, self.name) # 상수를 변수(method)로 변화시켜 일반화하는 리팩토링의 예
+        method()
+
+
+class WasRun(TestCase):
+    def __init__(self, name):
+        self.wasRun = None # 테스트케이스가 호출되었는지를 알려주는 어트리뷰트
+        TestCase.__init__(self, name)
+
+    def testMethod(self):
+        '''
+        메서드 호출여부 기록
+        메서드가 호출되었는지를 기억(flag)하는 메서드
+        '''
+        self.wasRun = 1
+
+
+class TestCaseTest(TestCase):
+    def testRunning(self):
+        '''
+        test 코드 실행 메서드
+        실행 과정을 print문이 아니라 assertion 형태로 구현
+        '''
+        test = WasRun("testMethod")
+        assert(not test.wasRun) # not None이므로, True 반환
+        test.run() # testMethod()를 직접 호출하지 않고, run()이라는 함수를 두어 두 부분을 분리함
+        assert(test.wasRun) # 1
+
+# main
+
+TestCaseTest("testRunning").run() # 성공!
+```
+
+#
+
+모든 테스트코드에서 자주 사용되는 `assert()`  는 가정설정문으로, 추정한 형태의 값이나 True가 나오지 않으면 Assertion Error를 발생시킨다(in python). 코딩을 하는 과정에서 결과값을 예측하여 오류를 방어해둔다는 입장에서 '방어적 프로그래밍'의 일환으로 보기도 한다.
+
+#
+
+위의 코드에서 사용된 `getattr()` 내장함수는 Pluggable Selector라고 할 수 있는데, 위치에 맞게 뺐다 끼웠다 할 수 있는 플러그처럼 런타임에서 특정 메서드, 속성등을 찾아 selecting해주는 역할을 한다.
+
+
+
+위의 예시에서는 method의 이름을 각각 if-else나 switch로 하드코딩 하지 않아도 되어 훨씬 효율적이라고 생각할 수 있지만, 정적 코드 분석을 어렵게 하는 주범이니 함부로 남발하진 말자.
+
+#
+
+[정적 코드 분석](https://ko.wikipedia.org/wiki/%EC%A0%95%EC%A0%81_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8_%EB%B6%84%EC%84%9D) 은 실제 실행없이 코드를 분석하는 일이다.
+
+동적 코드 분석은 Run타임에서 결과값을 즉시 확인하고 에러를 고칠 수 있지만, 코드의 흐름을 따라가기 어렵고 결과값이 숨겨진 문제를 모두 보여주지 못한다. 예를 들어 Memory Leak는 축적되어 메모리 에러가 뜨기 전까지는 누수를 알아챌 수 없다.
+
+따라서 논리적으로 코드의 흐름을 따라가며 문제상황을 미리 예상하거나 분석할 수 있도록 코드를 정리하여 정적코드분석을 가능하게 할 필요가 있다.
+
+
+
+---
+
+
+
+# 19장 테이블 차리기
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> **○ 먼저 setUp 호출하기**
+>
+> ○ 나중에 tearDown 호출하기
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ○ 여러 개의 테스트 실행하기
+>
+> ○ 수집된 결과를 출력하기
+
+#
+
+테스트코드의 공통 패턴 3A는 다음과 같다.
+
+1. 준비(arrange) - 객체를 생성한다.
+2. 행동(act) - 어떤 자극을 준다.
+3. 확인(assert) - 결과를 검사한다.
+
+#
+
+이 중 첫 번째 단계인 준비는 여러 테스트코드에 걸쳐 동일한 경우가 많다. 이 때 각 테스트코드마다 객체를 생성하는 코드를 흩뿌려 놓을 필요는 없으므로, 이를 세팅해주는 setUp을 작성해야 한다.
+
+이 setUp 과정에서 중요한 제약은 두가지이다.
+
+* `성능` : 테스트코드의 실행성능은 빠를 수록 좋으므로, 같은 객체를 사용하는 여러 다른 테스트코드가 있는 경우 **객체를 하나만 생성**한다.
+* `격리` : **각 테스트코드의 수행이 서로에게 영향을 미치지 않아야 한다.** 따라서, 한 테스트코드가 공유객체의 성질을 변경하여 다른 테스트의 결과에 영향을 주면 안된다.
+
+#
+
+일단, `성능` 은 아직 고려하지 않아도 괜찮다고 가정하고, `격리` 에 집중해보자. 테스트가 돌때마다 객체를 새로 생성하여 **"테스트 커플링"**을 피해야한다.
+
+#
+
+```python
+class TestCase():
+
+    def __init__(self, name):
+        self.name = name
+
+    def setUp(self):
+        '''
+        하위 클래스(WasRun,TestCaseTest)에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def run(self):
+        '''
+        메서드 동적 호출
+        getattr(object, name, default)는 object 내에서 주어진 string(name)과 동일한 method를 반환해준다.
+        따라서 테스트케이스의 이름을 전달했을 때, 해당 테스트케이스가 호출되었는지를 기록할 수 있다.
+        '''
+        self.setUp()
+        method = getattr(self, self.name) # 상수를 변수(method)로 변화시켜 일반화하는 리팩토링의 예
+        method()
+
+
+class WasRun(TestCase):
+    '''
+    메서드가 실행되었는지를 알려주는 테스트클래스
+    '''
+
+    def __init__(self, name):
+        self.wasRun = None # 테스트케이스가 호출되었는지를 알려주는 어트리뷰트
+        TestCase.__init__(self, name)
+
+    def testMethod(self):
+        '''
+        메서드 호출여부 기록
+        메서드가 호출되었는지를 기억(flag)하는 메서드
+        '''
+        self.wasRun = 1
+
+    def setUp(self):
+        '''
+        setUp 여부 기록
+        여러 테스트를 실행할 때, 테스트 커플링을 피하기 위해(환경을 독립시키기 위해) 사용하는 일종의 세팅 메서드
+        '''
+        self.wasRun = None
+        self.wasSetUp = 1
+
+
+class TestCaseTest(TestCase):
+    '''
+    테스트케이스를 수행하는 메인 클래스
+    '''
+
+    def setUp(self):
+        '''
+        WasRun 인스턴스 생성 파트(각 테스트메서드마다 인스턴스를 분리하기 위하여)
+        '''
+        self.test = WasRun("testMethod")
+
+    def testRunning(self):
+        '''
+        test 코드 실행 테스트코드
+        '''
+        # assert(not self.test.wasRun) # test-setUp이 존재하고 잘 돌아가므로 wasRun을 검사할 필요가 없어졌다(단순화)
+        self.test.run()
+        assert(self.test.wasRun) # 1
+
+    def testSetUp(self):
+        '''
+        setUp 메서드 호출여부 테스트코드
+        '''
+        self.test.run()
+        assert(self.test.wasSetUp)
+
+# main
+
+TestCaseTest("testRunning").run()
+TestCaseTest("testSetUp").run()
+
+```
+
+#
+
+중요한 점은, **한번에 메서드를 하나 이상 수정하지 않으면서 테스트가 통과하게 만들 수 있는 방법**을 찾도록 노력해야한다는 것이다.
+
+1부에서도 언급했던, 단단한 기반(초록 막대!)에 한 발을 두면서 새로운 곳으로 발을 옮기는 것과 비슷하다. 한번에 여러 곳을 고치면, 흐름을 따라가기도 어렵고, 최적의 리팩토링을 고민할 시간을 없앤다.
+
+... 실제 코드를 짜면서 내가 그걸 할 수 있을지는 모르겠지만.
+
+
+
+---
+
+
+
+# 20장 뒷정리하기
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> ~~○ 먼저 setUp 호출하기~~
+>
+> **○ 나중에 tearDown 호출하기**
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ○ 여러 개의 테스트 실행하기
+>
+> ○ 수집된 결과를 출력하기
+>
+> **○ WasRun에 로그 문자열 남기기**
+
+#
+
+`setUp()` 에서 만약 외부자원을 할당받는다면, 테스트가 독립적이기 위해서 해당 자원을 반환해주는 `tearDown()` 이 있어야 할 것이다.
+
+간단히 setUp처럼 플래그를 도입하여 할 수도 있지만, 문제가 있다. **플래그는 순서를 표시할 수 없다** 는 것이다. `setUp()` 은 테스트메서드 실행 전에 호출되어야하고, `tearDown()` 은 테스트메서드 호출 후에 실행되어야 한다. 이를 표시하기위해 플래그대신 로그(log)를 도입해보기로 한다.
+
+이는 위의 todo-list에서 **'WasRun에 로그 문자열 남기기'**에 해당한다.
+
+#
+
+```python
+class TestCase():
+
+    def __init__(self, name):
+        self.name = name
+
+    def setUp(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def tearDown(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def run(self):
+        '''
+        메서드 동적 호출
+        getattr(object, name, default)는 object 내에서 주어진 string(name)과 동일한 method를 반환해준다.
+        따라서 테스트케이스의 이름을 전달했을 때, 해당 테스트케이스가 호출되었는지를 기록할 수 있다.
+        '''
+        self.setUp()
+        method = getattr(self, self.name) # 상수를 변수(method)로 변화시켜 일반화하는 리팩토링의 예
+        method()
+        self.tearDown()
+
+
+class WasRun(TestCase):
+    '''
+    메서드가 실행되었는지를 알려주는 테스트클래스
+    '''
+
+    def __init__(self, name):
+        TestCase.__init__(self, name)
+
+    def setUp(self):
+        '''
+        setUp 여부 기록
+        여러 테스트를 실행할 때, 테스트 커플링을 피하기 위해(환경을 독립시키기 위해) 사용하는 일종의 세팅 메서드
+        '''
+        # self.wasSetUp = 1 # 플래그는 순서를 기록할 수 없다. 따라서 테스트 코드 호출전에 setUp과 tearDown의 순서를 보장할 수 없다.
+        self.log = "setUp" # 플래그대신 로그를 사용하여 코드의 흐름을 확실히 한다.
+
+    def testMethod(self):
+        '''
+        테스트메서드 호출여부 기록
+        메서드가 호출되었는지를 기억(flag)하는 메서드
+        '''
+        self.log += " testMethod"
+
+    def tearDown(self):
+        '''
+        tearDown 여부 기록
+        테스트를 위해 setUp에서 할당받은 외부 자원을, 테스트가 종료되면 반환하는 메서드
+        '''
+        self.log += " tearDown"
+
+
+
+class TestCaseTest(TestCase):
+    '''
+    테스트케이스를 수행하는 메인 클래스
+    '''
+
+    def testTemplateMethod(self): # testSetUp의 진화! (testRunning 메서드는 이제 필요없음.)
+        '''
+        setUp과 tearDown의 호출 순서 체크 테스트코드
+        '''
+        test = WasRun("testMethod") # 이제 test-SetUp과 Running 두 군데서 사용하지 않으니, setUp 메서드도 삭제하고 리팩토링을 되돌린다.
+        test.run()
+        assert("setUp testMethod tearDown" == test.log) # 플래그 대신에 로그를 검
+
+# main
+
+TestCaseTest("testTemplateMethod").run()
+```
+
+#
+
+tearDown이 어떤 외부 자원을 할당받는지는 몰라서 stub으로 구현하긴 했지만, 그건 setUp도 마찬가지니까... 일단 테스트를 통과하는것(초록막대)까지는 확인했다.
+
+이 장에서 크게 다룰 것은 없다.
+
+1. '플래그'에서 '로그'로 전략을 수정했다는 것, 그 이유는 순서를 남기기 위해서라는 것.
+2. TestCaseTest 클래스에서 테스트 메서드를 `testTemplateMethod()` 로 일원화하였으므로, setUp 메서드의 분리도 삭제하고 리팩토링을 되돌린 점.
+
+정도가 정리할 만한 것인듯 하다.
+
+
+
+---
+
+
+
+# 21장 셈하기
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> ~~○ 먼저 setUp 호출하기~~
+>
+> ~~○ 나중에 tearDown 호출하기~~
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ○ 여러 개의 테스트 실행하기
+>
+> **○ 수집된 결과를 출력하기**
+>
+> ~~○ WasRun에 로그 문자열 남기기~~
+
+#
+
+지금까지 구현한 코드에서는, 테스트메서드가 실패하면 예외가 발생하여 `tearDown()` 이 제대로 수행되지 않는다. 예외가 발생하건 말건 모든 테스트케이스와 setUp과 tearDown은 다 수행되어야한다.
+
+#
+
+여러 테스트를 실행하고, 그 결과를 다음과 같이 표현할 수 있다면 좋지 않을까?
+
+#
+
+> 5개 테스트가 실행됨
+>
+> 2개 실패
+>
+> TestCaseTest.testFooBar-ZeroDivide Exception
+>
+> MoneyTest.testNegation-AssertionError
+
+#
+
+위와 같이 뜬다면 최소한 어떤 에러들이 테스트케이스에서 발생했고, 무엇을 잡아야 하는지 파악할 수 있게 된다. 
+
+일단 시작은 사소하게, 테스트 하나의 실행결과를 기록하는 TestResult 객체를 반환하게 해본다.물론 차후에 테스트 여러개도 처리할 수 있게 리팩토링 할 것이다.
+
+#
+
+```python
+class TestCase():
+
+    def __init__(self, name):
+        self.name = name
+
+    def setUp(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def tearDown(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def run(self):
+        '''
+        메서드 동적 호출
+        '''
+        result = TestResult() # 실행결과 객체 할당
+        result.testStarted() # 실행 카운트 기록
+        self.setUp()
+        method = getattr(self, self.name)
+        method()
+        self.tearDown()
+        return result
+
+
+class WasRun(TestCase):
+    '''
+    메서드가 실행되었는지를 알려주는 테스트클래스
+    '''
+
+    def __init__(self, name):
+        TestCase.__init__(self, name)
+
+    def setUp(self):
+        '''
+        setUp 여부 기록
+        여러 테스트를 실행할 때, 테스트 커플링을 피하기 위해(환경을 독립시키기 위해) 사용하는 일종의 세팅 메서드
+        '''
+        self.log = "setUp"
+
+    def testMethod(self):
+        '''
+        테스트메서드 호출여부 기록
+        메서드가 호출되었는지를 기억(flag)하는 메서드
+        '''
+        self.log += " testMethod"
+
+    def testBrokenMethod(self):
+        '''
+        실패하는 테스트의 stub
+        '''
+        raise Exception # 이번 장에서는 아직 예외 핸들링을 하지 않았다!
+
+    def tearDown(self):
+        '''
+        tearDown 여부 기록
+        테스트를 위해 setUp에서 할당받은 외부 자원을, 테스트가 종료되면 반환하는 메드서
+        '''
+        self.log += " tearDown"
+
+
+
+class TestCaseTest(TestCase):
+    '''
+    테스트케이스를 수행하는 메인 클래스
+    '''
+
+    def testTemplateMethod(self):
+        '''
+        setUp과 tearDown의 호출 순서 체크 테스트코드
+        '''
+        test = WasRun("testMethod")
+        test.run()
+        assert("setUp testMethod tearDown" == test.log)
+
+    def testFailedResult(self):
+        '''
+        실패하는 테스트 수가 제대로 나오는지 체크하는 테스트코드
+        '''
+        test = WasRun("testBrokenMethod")
+        result = test.run()
+        assert("1 run, 1 failed" == result.summary())
+
+    def testResult(self):
+        '''
+        실행결과가 제대로 나오는지 체크하는 테스트코드
+        '''
+        test = WasRun("testMethod")
+        result = test.run()
+        assert("1 run, 0 failed" == result.summary())
+
+class TestResult:
+    '''
+    테스트메서드(들)의 실행결과를 기록하는 객체
+    '''
+
+    def __init__(self):
+        self.runCount = 0 # 실행된 테스트의 수 0으로 초기화
+
+    def testStarted(self):
+        self.runCount = self.runCount + 1
+
+    def summary(self):
+        '''
+        실행결과 반환 메서드
+        '''
+        return f"{self.runCount} run, 0 failed"
+
+# main
+
+TestCaseTest("testTemplateMethod").run()
+TestCaseTest("testFailedResult").run()
+TestCaseTest("testResult").run()
+
+```
+
+#
+
+일단 일단 상수들을 변수로 만들어 실제 구현을 몇 하긴 했지만, stub으로 구현한 부분도 많다. 예외가 발생할 경우의 Exception 핸들링이 되어있지 않다. `testBrokenMethod()`에서 실제로 예외가 발생하면 테스트케이스가 모두 실행되지 못하고 종료된다. 따라서 실행 결과도 제대로 얻을 수 없을 것이다.
+
+이 문제는 다음 장에서 해결해 보기로 한다.
+
+#
+
+테스트 하나를 성공시켰는데 그 다음 테스트에서 문제가 생기면, 두 단계 물러서는 것도 고려하라고 한다. TDD는 아주 방어적인 프로그래밍인 것 같다. 절대 두 칸을 건너뛰라고 하지 않는다. 오히려, 다음 칸에 문제가 있어보인다면 일단 뒤로 한칸 가서, 돌아가보라고 조언한다.
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> ~~○ 먼저 setUp 호출하기~~
+>
+> ~~○ 나중에 tearDown 호출하기~~
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ○ 여러 개의 테스트 실행하기
+>
+> ~~○ 수집된 결과를 출력하기~~
+>
+> ~~○ WasRun에 로그 문자열 남기기~~
+>
+> ○ 실패한 테스트 보고하기
+
+
+
+---
+
+
+
+# 22장 실패 처리하기
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> ~~○ 먼저 setUp 호출하기~~
+>
+> ~~○ 나중에 tearDown 호출하기~~
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ○ 여러 개의 테스트 실행하기
+>
+> ~~○ 수집된 결과를 출력하기~~
+>
+> ~~○ WasRun에 로그 문자열 남기기~~
+>
+> **○ 실패한 테스트 보고하기**
+
+#
+
+실패한 테스트의 갯수를 정확히 summary해서 내도록 코드를 리팩토링해본다.
+
+#
+
+```python
+class TestCase():
+
+    def __init__(self, name):
+        self.name = name
+
+    def setUp(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def tearDown(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def run(self):
+        '''
+        메서드 동적 호출
+        '''
+        result = TestResult() # 실행결과 객체 할당
+        result.testStarted() # 실행 카운트 기록
+        self.setUp() # 이 코드에서 setUp에 문제가 발생했을 경우에는 예외를 잡을 수 없다.
+        try :
+            method = getattr(self, self.name)
+            method()
+        except :
+            result.testFailed() # 예외 발생시 Failed 카운트 올리기
+        self.tearDown()
+        return result
+
+
+class WasRun(TestCase):
+    '''
+    메서드가 실행되었는지를 알려주는 테스트클래스
+    '''
+
+    def __init__(self, name):
+        TestCase.__init__(self, name)
+
+    def setUp(self):
+        '''
+        setUp 여부 기록
+        여러 테스트를 실행할 때, 테스트 커플링을 피하기 위해(환경을 독립시키기 위해) 사용하는 일종의 세팅 메서드
+        '''
+        self.log = "setUp"
+
+    def testMethod(self):
+        '''
+        테스트메서드 호출여부 기록
+        메서드가 호출되었는지를 기억(flag)하는 메서드
+        '''
+        self.log += " testMethod"
+
+    def testBrokenMethod(self):
+        '''
+        실패하는 테스트의 stub
+        '''
+        raise Exception # 이번 장에서는 아직 예외 핸들링을 하지 않았다!
+
+    def tearDown(self):
+        '''
+        tearDown 여부 기록
+        테스트를 위해 setUp에서 할당받은 외부 자원을, 테스트가 종료되면 반환하는 메드서
+        '''
+        self.log += " tearDown"
+
+
+
+class TestCaseTest(TestCase):
+    '''
+    테스트케이스를 수행하는 메인 클래스
+    '''
+
+    def testTemplateMethod(self):
+        '''
+        setUp과 tearDown의 호출 순서 체크 테스트코드
+        '''
+        test = WasRun("testMethod")
+        test.run()
+        assert("setUp testMethod tearDown" == test.log)
+
+    def testFailedResult(self):
+        '''
+        실패하는 테스트 수가 제대로 나오는지 체크하는 테스트코드
+        '''
+        test = WasRun("testBrokenMethod")
+        result = test.run()
+        assert("1 run, 1 failed" == result.summary())
+
+    def testFailedResultFormatting(self):
+        '''
+        테스트 시작/실패 메시지 체크 테스트코드
+        '''
+        result = TestResult()
+        result.testStarted() # 테스트 시작시 보내는 메시지
+        result.testFailed() # 테스트 실패시 보내는 메시지
+        assert("1 run, 1 failed" == result.summary())
+
+    def testResult(self):
+        '''
+        실행결과가 제대로 나오는지 체크하는 테스트코드
+        '''
+        test = WasRun("testMethod")
+        result = test.run()
+        assert("1 run, 0 failed" == result.summary())
+
+class TestResult:
+    '''
+    테스트메서드(들)의 실행결과를 기록하는 객체
+    '''
+
+    def __init__(self):
+        self.runCount = 0 # 실행된 테스트의 수 0으로 초기화
+        self.failureCount = 0
+
+    def testStarted(self):
+        self.runCount = self.runCount + 1
+
+    def testFailed(self):
+        self.failureCount += 1
+
+    def summary(self):
+        '''
+        실행결과 반환 메서드
+        '''
+        return f"{self.runCount} run, {self.failureCount} failed"
+
+# main
+
+print(TestCaseTest("testTemplateMethod").run().summary())
+print(TestCaseTest("testFailedResult").run().summary())
+print(TestCaseTest("testResult").run().summary())
+print(TestCaseTest("testFailedResultFormatting").run.summary())
+
+```
+
+#
+
+리팩토링 했지만 문제점이 있다. 위 코드에서는 testMethod의 broken여부만 exception처리한다는 점이다. 따라서 `setUp()` 이나 `tearDown()`에서 문제가 발생한 경우 예외를 처리할 수 없다.
+
+테스트가 독립적으로 실행되기 위해서는 세팅과 해제가 정상적으로 이루어져야하므로, 추후 이 부분을 리팩토링해보기로 한다.
+
+
+
+---
+
+
+
+# 23장 얼마나 달콤한지(How Suite it is!)
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> ~~○ 먼저 setUp 호출하기~~
+>
+> ~~○ 나중에 tearDown 호출하기~~
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> **○ 여러 개의 테스트 실행하기**
+>
+> ~~○ 수집된 결과를 출력하기~~
+>
+> ~~○ WasRun에 로그 문자열 남기기~~
+>
+> ~~○ 실패한 테스트 보고하기~~
+>
+> ○ setUp 에러 잡아서 보고하기
+
+#
+
+테스트케이스를 실행하는 main부에서, 모든 테스트들을 일일이 호출하고 있다는 점을 놓친 채로 포스팅했다. 이러한 호출 방식은 결국 중복의 한 형태이며, 어떤 방식으로든 중복은 개선의 여지가 있는 대상이다.
+
+`TestSuite ` 은 테스트 코드 여럿을 묶어서 한번에 돌리는 것인데, 특정 클래스 또는 특정 메서드를 테스트하기 위한 유용한 수단으로 사용된다.
+
+이번 장에서는 `TestSuite` 클래스를 구현하여 테스트 여럿을 집어넣은 뒤 한번에 result를 받아낼 것이다.
+
+#
+
+```python
+class TestCase():
+
+    def __init__(self, name):
+        self.name = name
+
+    def setUp(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def tearDown(self):
+        '''
+        하위 클래스 WasRun에서 오버라이드할 추상 메서드
+        '''
+        pass
+
+    def run(self, result):
+        '''
+        메서드 동적 호출
+        '''
+        result.testStarted()
+        self.setUp()
+        try :
+            method = getattr(self, self.name)
+            method()
+        except Exception as e :
+            result.testFailed()
+            print(e)
+        self.tearDown()
+        # return result # result를 명시적으로 반환할 필요가 없다! (가져온 result를 조작한 것이므로)
+
+
+class WasRun(TestCase):
+    '''
+    메서드가 실행되었는지를 알려주는 테스트클래스
+    '''
+
+    def __init__(self, name):
+        TestCase.__init__(self, name)
+
+    def setUp(self):
+        '''
+        setUp 여부 기록
+        여러 테스트를 실행할 때, 테스트 커플링을 피하기 위해(환경을 독립시키기 위해) 사용하는 일종의 세팅 메서드
+        '''
+        self.log = "setUp"
+
+    def testMethod(self):
+        '''
+        테스트메서드 호출여부 기록
+        메서드가 호출되었는지를 기억(flag)하는 메서드
+        '''
+        self.log += " testMethod"
+
+    def testBrokenMethod(self):
+        '''
+        실패하는 테스트의 stub
+        '''
+        raise Exception
+
+    def tearDown(self):
+        '''
+        tearDown 여부 기록
+        테스트를 위해 setUp에서 할당받은 외부 자원을, 테스트가 종료되면 반환하는 메서드
+        '''
+        self.log += " tearDown"
+
+class TestSuite:
+
+    def __init__(self):
+        self.tests = []
+
+    def add(self, test):
+        self.tests.append(test)
+
+    def run(self, result):
+        '''
+        :param result: 호출부 TestCaseTest.testSuite()에서 만든 result를 매개변수로 받아 그대로 사용한다.
+        '''
+        for test in self.tests:
+            test.run(result)
+        # return result # result를 명시적으로 반환할 필요가 없다! (가져온 result를 조작한 것이므로)
+
+
+class TestCaseTest(TestCase):
+    '''
+    테스트케이스를 수행하는 메인 클래스
+    '''
+
+    def setUp(self):
+        '''
+        각 메서드마다 TestResult()를 만들고 넘겨주고 할 것 없이, suite이 공유하는 result를 만든다.
+        '''
+        self.result = TestResult()
+
+    def testTemplateMethod(self):
+        '''
+        setUp과 tearDown의 호출 순서 체크 테스트코드
+        '''
+        test = WasRun("testMethod")
+        test.run(self.result)
+        assert ("setUp testMethod tearDown" == test.log)
+
+    def testResult(self):
+        '''
+        실행결과가 제대로 나오는지 체크하는 테스트코드
+        '''
+        test = WasRun("testMethod")
+        test.run(self.result)
+        assert ("1 run, 0 failed" == self.result.summary())
+
+    def testFailedResult(self):
+        '''
+        실패하는 테스트 수가 제대로 나오는지 체크하는 테스트코드
+        '''
+        test = WasRun("testBrokenMethod")
+        test.run(self.result)
+        assert ("1 run, 1 failed" == self.result.summary())
+
+    def testFailedResultFormatting(self):
+        '''
+        테스트 시작/실패 메시지 체크 테스트코드
+        '''
+        self.result.testStarted() # 테스트 시작시 보내는 메시지
+        self.result.testFailed() # 테스트 실패시 보내는 메시지
+        assert ("1 run, 1 failed" == self.result.summary())
+
+    def testSuite(self):
+        suite = TestSuite() # 테스트 스위트 - Composite
+        suite.add(WasRun("testMethod")) # 1번 테스트 - 테스트스위트의 Component
+        suite.add(WasRun("testBrokenMethod")) # 2번 테스트 - 테스트스위트의 Component
+        suite.run(self.result) # 컬렉션을 Component처럼 이용한다. Composite 패턴의 예
+        assert ("2 run, 1 failed" == self.result.summary()) # 2개의 테스트를 테스트 스위트로 묶어 수행하고, 1개가 실패했음
+
+class TestResult:
+    '''
+    테스트메서드(들)의 실행결과를 기록하는 객체
+    '''
+
+    def __init__(self):
+        self.runCount = 0 # 실행된 테스트의 수 0으로 초기화
+        self.failureCount = 0
+
+    def testStarted(self):
+        self.runCount = self.runCount + 1
+
+    def testFailed(self):
+        self.failureCount += 1
+
+    def summary(self):
+        '''
+        실행결과 반환 메서드
+        '''
+        return f"{self.runCount} run, {self.failureCount} failed"
+
+# main
+
+# 이전까지 하나씩 실행시켰던 것들을 suite로 한번에 묶어 처리한다.
+suite = TestSuite()
+suite.add(TestCaseTest("testTemplateMethod"))
+suite.add(TestCaseTest("testResult"))
+suite.add(TestCaseTest("testFailedResultFormatting"))
+suite.add(TestCaseTest("testFailedResult"))
+suite.add(TestCaseTest("testSuite"))
+result = TestResult()
+suite.run(result)
+print(result.summary())
+```
+
+#
+
+메인부만 보면 사실 적어야 할 코드의 양이 줄어든것 같지는 않지만(...) 개념적으로 모든 테스트를 하나의 테스트처럼 묶어(suite) 수행했다. 따라서 수행 결과(summary)도 다음과 같이 나온다.
+
+#
+
+> 5 run, 0 failed
+
+#
+
+TestSuite를 구현하는 것의 장점 중 하나로 저자는 컴포지트 패턴의 예제를 구현해볼 수 있다는 것이라고 말한다.
+
+`Composite pattern`은 소프트웨어 디자인패턴 중 하나로, 단일 객체든 객체 집합(컬렉션)이든 같은 방법으로 취급하는 것을 일컫는다. 컴포지트 패턴은 트리구조로 객체를 표현하는데, 이에 관한 설명은 [이곳](https://jdm.kr/blog/228)에 자세히 설명되어있어 크게 도움이 되었다. 
+
+#
+
+본문에서 컴포지트 패턴을 언급하는 것은, 테스트 여러개의 컬렉션(TestSuite)를 마치 하나의 테스트처럼 돌리고, 테스트 하나인것 처럼 result 하나만 받고있기 때문이다.
+
+193쪽의 내용부터는 살짝 이해하기 힘들었는데, 내가 이해한 내용은 다음과 같다.
+
+#
+
+하나의 테스트를 돌리고 하나의 result를 받는 `TestCase.run()` 처럼 동작하려면, 여러개의 테스트를 하나처럼 묶어 돌리는 `TestSuite.run()` 은 동일한 객체 TestResult 하나를 공유해야한다.
+
+따라서 각 테스트코드는 TestResult()를 함수내에서 선언하는 것이 아니라, result라는 매개변수로 전달받아 조작한다.(이를 본문에서 `매개변수 수집(collecting parameter)` 이라고 부른다.)
+
+이 과정에서 조작된 매개변수는 원래 함수 바깥에서 선언되어 있던 것이라, 다시 return해줄 필요도 없게 된다.
+
+#
+
+> ~~○ 테스트 메서드 호출하기~~
+>
+> ~~○ 먼저 setUp 호출하기~~
+>
+> ~~○ 나중에 tearDown 호출하기~~
+>
+> ○ 테스트 메서드가 실패하더라도 tearDown 호출하기
+>
+> ~~○ 여러 개의 테스트 실행하기~~
+>
+> ~~○ 수집된 결과를 출력하기~~
+>
+> ~~○ WasRun에 로그 문자열 남기기~~
+>
+> ~~○ 실패한 테스트 보고하기~~
+>
+> ○ setUp 에러 잡아서 보고하기
+>
+> ○ TestCase 클래스에서 TestSuite 생성하기
+
+#
+
+메인부에서 TestSuite를 생성하고 일일이 add하는 과정도 결국 일종의 중복이니, 이걸 해결하는 코드가 TestCase 클래스에 있으면 좋을 것이다. 이것도 todo-list에 추가시켜놓기로 한다.
+
+---
+
+
+
+# 24장 xUnit 회고
+
+#
+
+저자는 테스팅 프레임워크를 만들어보는 과정을 통하여 해당 언어에 숙달될 수 있고, TDD 케이스를 체험해 볼 수 있다고 말한다.
+
+#
+
+실제로도 짧은 2부의 코드를 일일이 타이핑하며 5 run, 0 failed가 뜨니까 신기했다. 테스트코드 프레임워크를 짜는 걸 목적으로 한 게 아니라 테스트코드를 실전적으로 짜보는 걸 다시 한번 연습해보는데에 저자의 목적이 있다는 것을 느꼈다.
+
+#
+
+더불어 xUnit과 JUnit에 대해 간단히 언급하며, 또 자바 specific한 말로 끝을 맺는다(...).
