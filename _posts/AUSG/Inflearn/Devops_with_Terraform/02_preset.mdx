@@ -4,6 +4,7 @@ date: 2020-11-11
 tags: [AWS, DevOps, IaC, Terraform]
 excerpt: 인프런 DevOps 강의 by 송주영님 수강 후기
 ---
+본 포스팅은 __송주영__님의 __인프런 DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS__를 보고 개인적으로 정리한 내용입니다.
 
 ## 테라폼 구성요소
 
@@ -28,6 +29,40 @@ init / plan / apply / import / state / destroy
 ### 기본 명령어 프로세스
 
 __init - plan - apply__
+
+
+## 세팅
+
+* Zsh 설치
+  * `sudo yum install zsh` - 아마존 리눅스
+  * `sudo apt-get install zsh` - ubuntu
+* Zsh 기본 쉘로 설정
+  * amazon linux 포함 몇몇 os들은 `sudo yum install util-linux-user.x86_64` - ubuntu는 하지 않아도 됨
+  * 패스워드 입력해야 할 경우 `sudo passwd <username>`으로 패스워드 변경
+  * `chsh -s /bin/zsh`
+* Oh-my-zsh 설치
+  * `sudo yum install git`으로 git 설치
+  * `curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh`
+* zsh 설정 변경
+  * `~/.zshrc`에서 테마 변경
+
+### 이 세팅의 장점
+
+* 중간자 검색을 통한 autocompletion
+  * 수십 수백번을 치는 명령어들을 tab 자동완성으로 간단하게 칠 수 있다
+* Git UI 개선
+
+
+## AWS CLI 설치
+
+* version 1, 2 중 2로 설치(기능이 더 많음) - Amazon Linux는 기본적으로 설치되어있음
+* 설치 후 unzip, install(사이트 참조)
+
+## Terraform 설치
+
+* `wget <link address>` - terraform 설치 링크를 넣는다.
+* Go 언어로 만들어진 파일이므로, unzip 후 binary 파일을 `echo $PATH`의 경로에 옮겨준다.
+
 
 
 
