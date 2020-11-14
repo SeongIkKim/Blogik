@@ -22,3 +22,13 @@ AWS 시작과 기본. 자세한 용어 및 개념은 인프런 링크 참조.
 라우팅 테이블이 인터넷 게이트웨이(aws 기준 igw)로 연결되어있다면 퍼블릭 서브넷,
 NAT-게이트웨이(aws 기준 nat)로 연결되어있다면 프라이빗이라고 할 수 있다.
 </Info>
+
+### 실습
+
+* provider와 resource 생성. 한 파일에 몰아두든 분리하든 상관없다.
+* vpc 필수값은 cidr_block - 사이더 블록이라고 하며, 개념은 [여기](https://needjarvis.tistory.com/573)를 참조한다
+* subnet 필수값
+  * vpc_id - subnet이 종속될 vpc id. `<vpc 리소스타입>.<vpc 로컬명>.id`로 설정
+  * cidr_block
+
+
