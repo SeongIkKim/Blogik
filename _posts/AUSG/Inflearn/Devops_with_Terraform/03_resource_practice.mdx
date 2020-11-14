@@ -1,0 +1,24 @@
+---
+title: DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS - 사전준비 편
+date: 2020-11-14
+tags: [AWS, DevOps, IaC, Terraform]
+excerpt: 인프런 DevOps 강의 by 송주영님 수강 후기
+---
+본 포스팅은 __송주영__님의 __인프런 DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS__를 보고 개인적으로 정리한 내용입니다.
+
+#
+
+# VPC와 subnet
+
+## VPC
+
+AWS 시작과 기본. 자세한 용어 및 개념은 인프런 링크 참조.
+[VPC 관련 개념을 굉장히 잘 설명해놓은 링크](https://www.google.com/search?q=VPC%EB%9E%80&oq=VPC%EB%9E%80&aqs=chrome..69i57j69i59j0i5i30l3j69i61.2327j0j9&sourceid=chrome&ie=UTF-8)
+
+콘솔에서 VPC를 만드는 과정은 생략한다.
+
+<Info>
+서브넷의 프라이빗 퍼블릭 여부는 라우팅테이블에 따라 결정된다.
+라우팅 테이블이 인터넷 게이트웨이(aws 기준 igw)로 연결되어있다면 퍼블릭 서브넷,
+NAT-게이트웨이(aws 기준 nat)로 연결되어있다면 프라이빗이라고 할 수 있다.
+</Info>

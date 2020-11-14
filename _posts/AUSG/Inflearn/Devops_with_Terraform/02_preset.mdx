@@ -113,12 +113,18 @@ IAM 계정에서 진행할것(정석).
 * `plan`으로 결과 예상 - 이 때, plan은 실제로 리소스를 확인하지 않고, 오로지 코드만 보고 판단함
 * `apply`로 현재 코드를 실제 인프라에 반영 후 state에 기록
 * 현재 state 상태는 `state list`로 확인
+* 인프라에 배포된 서비스를 state로 옮겨오고 싶다면 `import` 사용
+
 
 <Info>
 BucketAlreadyExists 오류가 뜬다면, bucket명을 변경하자.(s3.tf 내의 bucket 필드)
 S3 버킷은 globalnamespace를 가지고 있으므로, 다른 누군가가 해당 이름을 사용하고 있다는 말.
 </Info>
 
-
-
+<Info>
+import 이후에는 plan을 하여 내용을 확인 한다.
+이때 plan을 했을 경우 로컬에 해당 코드가 없으므로 리소스가 삭제/변경된다고 뜬다.
+따라서 해당 내용에 맞는 코드를 작성후 apply해주어야한다.
+import-plan-apply
+</Info>
 
