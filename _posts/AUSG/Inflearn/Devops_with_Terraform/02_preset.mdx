@@ -110,7 +110,9 @@ IAM 계정에서 진행할것(정석).
 ### 과정
 
 * provider, resource 등 작성 이후 `init` (따로 설정하지 않으면 최초 backend는 로컬)
-* `plan`으로 결과 예상 - 이 때, plan은 실제로 리소스를 확인하지 않고, 오로지 코드만 보고 판단함
+* `plan`으로 결과 예상
+  * 이 때, plan은 backend의 .tfstate / 실제 리소스 / 로컬 코드(.terraform)를 모두 확인하여 예측결과를 보여준다
+  * apply 시, 로컬 코드를 기준으로 상태를 적용시킨다.
 * `apply`로 현재 코드를 실제 인프라에 반영 후 state에 기록
 * 현재 state 상태는 `state list`로 확인
 * 인프라에 배포된 서비스를 state로 옮겨오고 싶다면 `import` 사용
@@ -128,3 +130,14 @@ import 이후에는 plan을 하여 내용을 확인 한다.
 import-plan-apply
 </Info>
 
+
+---
+201115 추가
+
+Basic한 테라폼 파일의 분류는 다음과 같다.
+1. `provider.tf` - 리소스를 생성할 프로바이더 명시
+2. `<resource>.tf` - 프로바이더에 생성되는 리소스의 설정 코드
+3. `.terraform` 폴더 - 로컬에서 반영한 테라폼 형상에 대한 설정파일. 로컬 코드 기록만 남으므로 타인의 apply 기록은 남지 않는다.
+4. `terraform.tfstate` - 테라폼 apply로 반영된 형상 결과 저장 코드. 협업 시 자신의 코드와 타인의 코드를 동기화하기 위해 필요하다. 설정한 backend 위치에 저장된다.
+
+즉 `terraform.tfstate` 코드(파일)는 협업을 위해 공유하는 형상 코드라고 생각하면 된다.

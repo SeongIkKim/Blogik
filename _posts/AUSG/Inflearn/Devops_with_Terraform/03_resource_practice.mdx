@@ -1,10 +1,12 @@
 ---
-title: DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS - 사전준비 편
-date: 2020-11-14
+title: DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS - 메롱
+date: 2020-11-15
 tags: [AWS, DevOps, IaC, Terraform]
 excerpt: 인프런 DevOps 강의 by 송주영님 수강 후기
 ---
 본 포스팅은 __송주영__님의 __인프런 DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS__를 보고 개인적으로 정리한 내용입니다.
+
+
 
 #
 
@@ -13,22 +15,84 @@ excerpt: 인프런 DevOps 강의 by 송주영님 수강 후기
 ## VPC
 
 AWS 시작과 기본. 자세한 용어 및 개념은 인프런 링크 참조.
-[VPC 관련 개념을 굉장히 잘 설명해놓은 링크](https://www.google.com/search?q=VPC%EB%9E%80&oq=VPC%EB%9E%80&aqs=chrome..69i57j69i59j0i5i30l3j69i61.2327j0j9&sourceid=chrome&ie=UTF-8)
+[(VPC 관련 개념을 굉장히 잘 설명해놓은 링크)](https://www.google.com/search?q=VPC%EB%9E%80&oq=VPC%EB%9E%80&aqs=chrome..69i57j69i59j0i5i30l3j69i61.2327j0j9&sourceid=chrome&ie=UTF-8)
 
 콘솔에서 VPC를 만드는 과정은 생략한다.
 
 <Info>
 서브넷의 프라이빗 퍼블릭 여부는 라우팅테이블에 따라 결정된다.
-라우팅 테이블이 인터넷 게이트웨이(aws 기준 igw)로 연결되어있다면 퍼블릭 서브넷,
-NAT-게이트웨이(aws 기준 nat)로 연결되어있다면 프라이빗이라고 할 수 있다.
+라우팅 테이블이 Internet Gateway(aws 기준 igw)로 연결되어있다면 퍼블릭 서브넷,
+NAT-Gateway(aws 기준 nat)로 연결되어있다면 프라이빗이라고 할 수 있다.
 </Info>
 
-### 실습
+<Info>
+퍼블릭 서브넷의 서버들은 각각 고유한 public ip를 가지고 있고, Internet Gateway를 통해 바로 아웃바운드 트래픽으로 연결될 수 있다.
+그러나 프라이빗 서브넷의 서버들은 퍼블릭 서브넷의 NAT-Gateway를 경유한 뒤 Internet Gateway로 나가며,
+이 과정에서 모든 서버들의 (public) ip 주소는 NAT-Gateway의 주소로 통일된다.
+</Info>
+
+### Private Subnet
+
+외부에서 접근하지 말아야 하는 서비스들은 보통 프라이빗 서브넷으로 관리하며, 퍼블릭 서브넷과 달리 외부에서 inbound로 들어갈 수 없다.
+그렇지만, 필요한 패키지를 다운로드 받거나 써드파티 API를 사용하는 경우에는 인터넷을 연결해주어야하므로, 이 경우 NAT-Gateway를 사용한다
+NAT-Gateway는 반드시 고정IP(Elastic IP)를 가지고 있어야 하며, 모든 아웃바운드 요청은 EIP로 처리된다.
+
+### Route Table
+
+서브넷에 종속적인 table로, 서브넷의 네트워크 트래픽을 전달할 위치를 결정하는 데에 사용된다.
+여러 서브넷에서 동시에 사용될 수 있으며, 이러한 연결 작업을 `association`이라고 한다.
+
+
+## 실습
 
 * provider와 resource 생성. 한 파일에 몰아두든 분리하든 상관없다.
 * vpc 필수값은 cidr_block - 사이더 블록이라고 하며, 개념은 [여기](https://needjarvis.tistory.com/573)를 참조한다
 * subnet 필수값
-  * vpc_id - subnet이 종속될 vpc id. `<vpc 리소스타입>.<vpc 로컬명>.id`로 설정
-  * cidr_block
+  * `vpc_id` - subnet이 종속될 vpc id. `<vpc 리소스타입>.<vpc명>.id`로 설정
+  * `cidr_block`
+* elastic ip 필수값
+  * `vpc` - boolean
+  * `lifecycle`
+* gateway 필수값
+  * Internet Gateway
+    * `vpc_id`
+  * NAT-Gateway
+    * __`allocation_id` - `<eip 타입>.<eip명>.id`__
+    * `subnet_id` - `<subnet 타입>.<subnet 명>.id` --> 이때, private이 아니라 public subnet을 연결해야 한다. NAT-Gateway는 구조적으로 public subnet에 있다!
+* routetable 관련 필수값
+  * routetable
+    * `vpc_id`
+  * route table associate
+    * `subnet_id`
+    * `route_table_id` - `<routetable 타입>.<routetable 명>.id`
+  * route table rules --> 이렇게 따로 선언하지 않고, route_table 안에 route로 만들어도 된다(inner rule)
+    * `route_table_id`
+    * `destination_cidr_block` - outbound traffic 룰
+    * `(nat_)gateway_id`
+* endpoint 관련 필수값
+  * `vpc_id`
+  * `service_name` - s3같은 서비스에 게이트웨이를 통하지 않고 바로 연결
+  * 물론, routetable도 연결해주어야 한다.
 
 
+<Info>
+Route Rule을 Route Table안에 inner rule로 설정할 때에는, 아래와 같은 형식을 취한다.
+그러나 이러한 방식은 코드가 길어질수록 확장성에 문제가 생기므로, 추천되지는 않는 방식이다.
+</Info>
+
+```shell
+resoure "aws_route_table" "route_tb" {
+  ...
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = <gateway 타입>.<gateway 명>.id
+  }
+  ...
+}
+
+```
+
+<Warning>
+AWS NAT-Gateway는 비용이 많이 드는 서비스이므로 실습이 끝나면 반드시 삭제하자.
+</Warning>
