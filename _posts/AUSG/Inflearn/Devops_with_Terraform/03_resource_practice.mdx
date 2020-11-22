@@ -188,20 +188,47 @@ AWS account가 나뉘어서 권한이 들어가는 경우 Cross Account라고 �
 ## 실습
 
 * provider와 resource 생성. 그러나 IAM resource는 provider의 region에 종속적이지 않음.
-* IAM user
-  * 필수값 name
+* IAM user 필수값
+  * name
   * user를 생성한 뒤 설정해야 하는것 
-    * `password`
-    * `mfa(멀티팩터 인증)`
-    * 이게 없으면 콘솔에 로그인 할 수 없으므로 실제 패스워드 설정은 aws cli나 콘솔로 설정해주어야한다.
+    * password
+    * mfa(멀티팩터 인증)
+    * 없으면 콘솔에 로그인 할 수 없으므로 실제 패스워드 설정은 aws cli나 콘솔로 설정해주어야한다.
     * Terrform으로도 생성 가능하지만, 이 경우 코드에 password가 남으므로 보안상 취약점이 생긴다
-* IAM group
-  * 필수값 name
-* IAM group_membership
-  * group 객체와 user 객체간의 회원관계(membership)를 정의하는 리소스
-  * 필수값
-    * name - `aws_iam_group.<객체명>.name`
-    * users = `[aws_iam_user.<객체명>.name, ... , ...]`
-    * group = aws_iam_group.<객체명>.name>
+* IAM group 필수값
+  * name
+  * IAM group_membership
+    * group 객체와 user 객체간의 회원관계(membership)를 정의하는 리소스
+    * 필수값
+      * name - `aws_iam_group.<객체명>.name`
+      * users - `[aws_iam_user.<객체명>.name, ... , ...]`
+      * group - `aws_iam_group.<객체명>.name>`
+* IAM role 필수값
+  * name
+  * role_policy
+    * aws_iam_role_policy 리소스 따로 정의.
+    * 필수값
+      * name
+      * role
+      * policy structure
+  * IAM role_profile
+    * IAM 역할을 위한 컨테이너
+    * 인스턴스 시작시 EC2 인스턴스에 역할 정보 전달.
+    * 콘솔에서 EC2 role을 생성하면 자동으로 인스턴스 프로파일을 생성하여 동일한 이름 부여해줌.
+    * 필수값
+      * name 
+      * role - `aws_iam_role.<객체명>.name`
+* IAM policy
+  * AWS에서 만들어놓은 Policy set인 __'AWS Managed policy'__와, User가 직접 생성하는 __'Customer Managed Policy'__로 나뉜다.
+  * user policy 필수값
+    * name
+    * user - `aws_iam_user.<객체명>.name`
+    * policy structure
+  * group policy 등도 같은 방식으로 설정.
+  
 
-
+<Info>
+EC2의 aws configure에 들어가있는 액세스 키, 시크릿 키가 없이는 관련 객체들에 접근하기 어렵다.
+그러나 이런 액세스 키, 시크릿 키는 사용하거나 저장할 때 보안문제가 생기기때문에 로컬컴퓨터에만 저장해두거나, 최대한 저장처를 줄이는 것이 좋다.
+따라서 이 때 권한이 있는 IAM role을 할당하여 접근할 수 있게 하는 것이 Best Practice.
+</Info>
