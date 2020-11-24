@@ -35,7 +35,7 @@ state는 apply 이후 `terraform.tfstate` 라는 파일에 저장된다.
 }
 ```
 #
-__주의할 점은, 내가 적용한 시점의 상태이지, 실제 resource의 구성이 아니라는 것이다!__apply의
+__주의할 점은, 내가 적용(apply)한 시점의 상태이지, 실제 resource의 구성이 아니라는 것이다!__
 
 ## 사용하는 이유
 * Locking : 기본적으로 Terraform 코드는 협업의 결과물이며, 원격 저장소를 사용하여 동시에 같은 state에 접근하는 것을 막아 의도치않은 변경을 예방한다.
@@ -43,7 +43,7 @@ __주의할 점은, 내가 적용한 시점의 상태이지, 실제 resource의 
 
 ## 실습(with S3)
 
-1. init.tf 생성
+1. `init.tf` 생성
 2. S3 버킷을 백엔드로 지정한다. S3 버킷은 쉽게 구축할 수 있고 versioning을 지원하는 좋은 저장소이다.
   * s3 resource 생성
 3. terraform state lock을 걸 Dynamo DB를 생성한다.
@@ -51,7 +51,7 @@ __주의할 점은, 내가 적용한 시점의 상태이지, 실제 resource의 
     * name
     * hash_key
     * billing_mode
-4. backend.tf 생성
+4. `backend.tf` 생성
 5. backend 저장소 코드 설정
   * s3 저장소일시
     * bucket = `bucket명`
@@ -59,7 +59,7 @@ __주의할 점은, 내가 적용한 시점의 상태이지, 실제 resource의 
     * region = `<리전 명>`
     * encrypt = `<boolean>`
     * dynamodb_table = `dynamodb table명`
-6. terraform init
+6. `terraform init`
 7. 완료된다면 backend에 tfstate파일이 저장되므로, 로컬에서 tfstate 관련 파일을 지워도 backend에서 꺼내와 plan, apply등을 수행한다.
 8. 만약 저장된 state파일을 가져오려면, `terraform state pull` 사용
 
@@ -118,6 +118,6 @@ Terraform 코드는 HCL syntax를 따르며, json 형식과 비슷함
 ### 수강후기
 
 블로그에도 열심히 정리해놨지만, 이 강의는 Terraform의 입문수업뿐만 아니라 AWS 기초 수업도 담당하고 있다.
-AWS에서 가장 많이 사용되는 메인 서비스들인 IAM, VPC, S3 등의 서비스들을 테라폼 코드로 빌드하면서, 동시에 해당 리소스들의 코어가 무엇이고 왜 그렇게 만들어지고있는지를 알수 있다.
+AWS에서 가장 많이 사용되는 메인 서비스들인 IAM, VPC, S3 등의 서비스들을 테라폼 코드로 빌드하면서, 동시에 해당 리소스들의 코어가 무엇이고 왜 그렇게 만들어지고있는지를 알수 있다.  
 DevOps에 관심있는 주니어로서 인프라는 참 입문과 실습 코드를 보기 힘들어 공부하기 힘든 분야인데, 이 강의는 그런 점에서 아주 유용한 강의이다.
 입문자를 대상으로 하므로 깊은 수준까지 들어가지는 않지만, 덕분에 Terraform을 비롯해 Ansible 등의 IaC 툴과 DevOps 전반에 대해 지식과 흥미를 더하게 되었다.
