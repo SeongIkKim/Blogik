@@ -26,22 +26,44 @@ excerpt: Linux Mastery - Master the Linux Command Line 강의 정리
 
 ## 개념
 PATH(환경변수)에서 해당 command에 대한 프로그램을 불러오는 것이 command.
-*PATH는 `echo $PATH` 커맨드로 확인할 수 있다.
+*PATH는 `echo $PATH` 커맨드로 확인할 수 있다.  
+
+## Standard Data Stream과 redirection, piping
+
+__Standard Data Stream(표준 스트림)__ : Command의 Input, Output, Error의 데이터 흐름을 통틀어 일컫는 말. 텍스트로 이루어져 있다.
+  - Standard Input : 0, 키보드로부터 터미널에 입력된 유저의 input
+  - Standard Output : 1, Shell에서 해석된 커맨드를 수행한 결과물, default는 terminal에 출력.
+  - Standard Error : 2, Shell에서 해석된 커맨드를 수행하였으나 발생한 에러. default는 terminal에 출력.
+
+__redirection__ : Output과 Error의 방향을 바꾸는 것 (default 터미널에서 파일 등으로 변경)
+  - `num > destination` : destination에 num 덮어쓰기
+  - `num >> destination` : destination 끝부분에 num 추가하기(삽입)
+  - `num < source` : num에 source를 입력하기
+
+__piping__ : redirection 중 Output을 다른 Command의 Input으로 연결하는 경우
+
+
 
 ## 특수한 command
 
 * `man -options inputs` - 메뉴얼 열람
-  * -k : 해당 inputs(검색어)이 존재하는 섹션들을 search
-  * `man sectionNum inputs`로 해당 섹션 열람 가능.
-  * SYNOPSIS에 사용법이 나와있다.
-  
+  * -k : 해당 inputs(검색어)이 존재하는 섹션들을 search -> 섹션은 Manual Structrue Cheat Sheat 참조
+  * `man sectionNum inputs`로 해당 섹션의 inputs 관련 메뉴얼 열람 가능.
+  * SYNOPSIS에 command의 사용법이 나와있다.
+* `help` - 도움말. man과 비슷
+  * man으로 나오지 않는 커맨드는 help를 사용하자
+* `cat` - concatenate files하고 output을 print한다.
+* `tty` - 표준입력장치에 연결되어 있는 terminal의 파일명(path포함)을 출력
 
 ## 자주 쓰이는 Command
 * `history` - 사용했던 명령어 목록 출력
   * history의 line number를 확인 한 뒤 `!<line number>`로 해당 명렁어 불러오기
   * `!!`로 최근 명령어 재입력
   * -c : 히스토리 삭제
-* 
+* `ls` - 현재 directory 내용물 리스트화
+  * -l : longform으로 출력
+  * -h : -l이나 -s로 파일 사이즈를 불러올 때, 읽기 쉬운 단위로 변환(K, M 등)
+
 
 
 ## 잡다한 Command
