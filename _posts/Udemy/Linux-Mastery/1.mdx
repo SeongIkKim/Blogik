@@ -1,0 +1,54 @@
+---
+title: Linux 커맨드 정리
+date: 2020-11-25
+tags: [Udemy, Linux]
+excerpt: Linux Mastery - Master the Linux Command Line 강의 정리
+---
+
+### Shell과 Command의 차이
+* Command는 terminal에 치는 text에 불과하다.
+* Shell은 Command를 해석하는 프로그램이다.
+* Shell에 따라 같은 Command도 다른 방식으로 해석된다.
+* Terminal은 Shell로 연결되는 window이다.
+* Command는 대소문자가 구별되어야한다.
+
+
+# Command
+  
+`commandName -options inputs`  
+
+* 이때 options 앞의 dash는 2개를 붙이는 경우도 있으므로, 해당 command의 documentation을 확인할 것.
+  * '-'의 경우는 short option. Unix traditional standard를 따른 형태
+  * '--'의 경우는 long option. GNU extension을 따른 형태
+* `<mandatory>` : 필수 요소
+* `[option1 | option2 | option3]` : 선택 요소
+* `...` : 하나 이상 사용할 수 있음
+
+## 개념
+PATH(환경변수)에서 해당 command에 대한 프로그램을 불러오는 것이 command.
+*PATH는 `echo $PATH` 커맨드로 확인할 수 있다.
+
+## 특수한 command
+
+* `man -options inputs` - 메뉴얼 열람
+  * -k : 해당 inputs(검색어)이 존재하는 섹션들을 search
+  * `man sectionNum inputs`로 해당 섹션 열람 가능.
+  * SYNOPSIS에 사용법이 나와있다.
+  
+
+## 자주 쓰이는 Command
+* `history` - 사용했던 명령어 목록 출력
+  * history의 line number를 확인 한 뒤 `!<line number>`로 해당 명렁어 불러오기
+  * `!!`로 최근 명령어 재입력
+  * -c : 히스토리 삭제
+* 
+
+
+## 잡다한 Command
+
+* `cal` - 캘린더 출력
+  * -y : 올 해 달력 전체 출력
+  * <연도> : 당해년도 달력 전체 출력
+  * -A <숫자> / -B <숫자> : 해당 일자의 <숫자>개월 이후(after), 이전(before) 비교
+* `date` - 현재일시 출력(타임존 기준)
+* 
