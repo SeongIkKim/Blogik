@@ -40,7 +40,10 @@ __redirection__ : Output과 Error의 방향을 바꾸는 것 (default 터미널�
   - `num >> destination` : destination 끝부분에 num 추가하기(삽입)
   - `num < source` : num에 source를 입력하기
 
-__piping__ : redirection 중 Output을 다른 Command의 Input으로 연결하는 경우
+__piping__ : redirection 중 Output을 다른 Command의 Input으로 연결하는 경우  
+  - `Command 1 | Command 2` : Command 1의 output을 Command 2의 input으로 piping
+   
+ __tee__ : piping에 사용되는 data stream의 snapshot을 출력(파일에 저장 가능)
 
 
 
@@ -54,6 +57,11 @@ __piping__ : redirection 중 Output을 다른 Command의 Input으로 연결하�
   * man으로 나오지 않는 커맨드는 help를 사용하자
 * `cat` - concatenate files하고 output을 print한다.
 * `tty` - 표준입력장치에 연결되어 있는 terminal의 파일명(path포함)을 출력
+* `tee` - piping 도중 data stream snapshot 제공
+* `xargs` - piping 도중 data stream을 command의 특수한 input 형태에 맞게 변환
+  * `Command 1 | xargs Command2`
+* `alias` - 특정 pipeline에 nickname을 붙여 재사용할 수 있도록 만듦
+  * `alias <별칭>='실제 커맨드'`
 
 ## 자주 쓰이는 Command
 * `history` - 사용했던 명령어 목록 출력
@@ -73,4 +81,6 @@ __piping__ : redirection 중 Output을 다른 Command의 Input으로 연결하�
   * <연도> : 당해년도 달력 전체 출력
   * -A <숫자> / -B <숫자> : 해당 일자의 <숫자>개월 이후(after), 이전(before) 비교
 * `date` - 현재일시 출력(타임존 기준)
-* 
+* `cut` - input을 특정 기준에 따라 분리
+  * --delimiter "기준" : 분리 기준 설정
+  * --field <숫자> : 분리한 것들 중 해당 index(1부터 시작)의 column을 output으로 가져옴
