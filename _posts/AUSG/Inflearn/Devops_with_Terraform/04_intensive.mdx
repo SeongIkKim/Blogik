@@ -1,0 +1,123 @@
+---
+title: DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS - 심화편
+date: 2020-11-24
+tags: [AWS, DevOps, IaC, Terraform]
+excerpt: 인프런 DevOps 강의 by 송주영님 수강 후기
+---
+본 포스팅은 __송주영__님의 __인프런 DevOps:Infrastructure as Code with 테라폼(Terraform) and AWS__를 보고 개인적으로 정리한 내용입니다.
+
+심화파트에서는 Terraform과 aws의 기본보다는, Terraform을 어떻게 하면 더 잘 쓸수 있는지, 어떻게 고도화하는지에 대해 알아보기로 한다.
+
+---
+
+# Terraform Backend
+
+## 기본
+state를 저장하는 __원격 저장소__.
+Terrform state를 어디에 저장하고 가져올지에 대한 설정  
+* default는 로컬 스토리지
+* backend로 S3, consul, etcd 등의 저장소를 사용할 수 있다.
+
+### Terraform state에 대해 다시 짚고넘어가자면..
+state는 apply 이후 `terraform.tfstate` 라는 파일에 저장된다.
+즉, __apply의 결과를 저장해놓은 상태__이다.  
+```json
+{
+    "version": 4,
+    "terraform_version" : "0.12.24",
+    "serial" : 3,
+    "lineage" : "XXXXXX-XXXX-XXXX...",
+    "outputs": {},
+    "resource": [
+        {...},
+        {...}
+    ]
+}
+```
+#
+__주의할 점은, 내가 적용(apply)한 시점의 상태이지, 실제 resource의 구성이 아니라는 것이다!__
+
+## 사용하는 이유
+* Locking : 기본적으로 Terraform 코드는 협업의 결과물이며, 원격 저장소를 사용하여 동시에 같은 state에 접근하는 것을 막아 의도치않은 변경을 예방한다.
+* Backup : 로컬스토리지가 아닌 원격 저장소에 저장함으로써 state 파일의 유실을 방지한다.
+
+## 실습(with S3)
+
+1. `init.tf` 생성
+2. S3 버킷을 백엔드로 지정한다. S3 버킷은 쉽게 구축할 수 있고 versioning을 지원하는 좋은 저장소이다.
+  * s3 resource 생성
+3. terraform state lock을 걸 Dynamo DB를 생성한다.
+  * 필수값
+    * name
+    * hash_key
+    * billing_mode
+4. `backend.tf` 생성
+5. backend 저장소 코드 설정
+  * s3 저장소일시
+    * bucket = `bucket명`
+    * key = `terraform/<own-your-path>/terraform.tfstate` - s3에 저장되는 장소로, 실제 ec2 내부의 path와 일치하는것이 좋음.
+    * region = `<리전 명>`
+    * encrypt = `<boolean>`
+    * dynamodb_table = `dynamodb table명`
+6. `terraform init`
+7. 완료된다면 backend에 tfstate파일이 저장되므로, 로컬에서 tfstate 관련 파일을 지워도 backend에서 꺼내와 plan, apply등을 수행한다.
+8. 만약 저장된 state파일을 가져오려면, `terraform state pull` 사용
+
+---
+
+# Terraform Variables
+
+Terraform 코드는 HCL syntax를 따르며, json 형식과 비슷함  
+자세한 variable 종류는 [terraform variables](https://www.terraform.io/docs/configuration/variables.html)를 참고할것.
+
+## 실습
+
+변수 정의하는 `variables.tf` 만든 후, `terraform.tfvars` 파일로 변수에 상용값 대입
+이 방식 말고도 모듈방식, 또는 키보드 input 방식 등이 있음.
+
+1. `variables.tf` 생성 후, variable 정의와 description 등 작성
+2. `terraform.tfvars`에 `<variable> = "<상용값>"` 작성
+3. tf 파일에서 `var.<변수명>` 으로 변수 사용
+4. `outputs.tf` 파일에 output을 지정해놓은뒤 apply하면, 해당 변수를 tfstate에 저장한다.
+  * 주 사용용도는 remote state 확인
+  * 변수 값이 제대로 저장되었는지 확인할때도 사용하곤 한다.
+
+# Terraform Fucntions
+
+아직 사용자 정의 함수를 만들 수는 없지만, terraform에서 제공하는 다양한 built-in 함수를 사용하여 코드 생산성을 높일 수 있다.
+
+## 종류
+
+* Numeric functions
+* __String functions__
+* __Collection functions__
+* Encoding functions
+* FileSystem functions
+* Date and Time functions
+* Hash and Crypto functions
+* IP Network functions
+* Type Conversion functions
+
+각 디테일과 사용법은 [Terraform Functions](https://www.terraform.io/docs/configuration/functions.html)를 참고한다.  
+
+강의자 송주영님의 Github에서 [현업에서 사용되는 terraform 코드들]([](https://github.com/DevopsArtFactory/aws-provisioning))을 참고할 수 있다.  
+
+자주 사용되는 `count`, `element`, `flatten` 등의 함수를 사용해보자.  
+
+
+# Terraform with Github
+
+테라폼은 IaC 도구, 결국 코드로써의 관리가 필요하며, 따라서 팀원간의 코드리뷰가 필요하다.  
+테라폼 코드를 github에 커밋하고, 동료들에게 코드 리뷰(with pull request)를 받고, 이후 apply하는 프로세스를 갖추어야한다.  
+
+
+---
+
+#
+
+### 수강후기
+
+블로그에도 열심히 정리해놨지만, 이 강의는 Terraform의 입문수업뿐만 아니라 AWS 기초 수업도 담당하고 있다.
+AWS에서 가장 많이 사용되는 메인 서비스들인 IAM, VPC, S3 등의 서비스들을 테라폼 코드로 빌드하면서, 동시에 해당 리소스들의 코어가 무엇이고 왜 그렇게 만들어지고있는지를 알수 있다.  
+DevOps에 관심있는 주니어로서 인프라는 참 입문과 실습 코드를 보기 힘들어 공부하기 힘든 분야인데, 이 강의는 그런 점에서 아주 유용한 강의이다.
+입문자를 대상으로 하므로 깊은 수준까지 들어가지는 않지만, 덕분에 Terraform을 비롯해 Ansible 등의 IaC 툴과 DevOps 전반에 대해 지식과 흥미를 더하게 되었다.
