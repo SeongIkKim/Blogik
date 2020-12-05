@@ -1,5 +1,5 @@
 ---
-title: Node Course 정리
+title: Node 및 javascript 정리
 date: 2020-12-04
 tags: [Udemy, Node, Express]
 excerpt: The Complete Node.js Developer Course (3rd Edition) Summary
@@ -8,13 +8,72 @@ excerpt: The Complete Node.js Developer Course (3rd Edition) Summary
 # Node.js
 
 ## 구성
-* npm : Node Packaged Manager, Node.js용 패키지 관리 툴  
-* npm_module : npm에 설치된 (로컬)패키지가 저장되는 곳. -g 옵션으로 설치 시 글로벌 패키지 폴더에 저장  
-* package.json : node.js의 의존성 패키지 관리 문서  
+
+- npm : Node Packaged Manager, Node.js용 패키지 관리 툴
+- npm_module : npm에 설치된 (로컬)패키지가 저장되는 곳. -g 옵션으로 설치 시 글로벌 패키지 폴더에 저장
+- package.json : node.js의 의존성 패키지 관리 문서
 
 ## Packages
 
-* `nodemon` : node 파일 변경사항을 자동 적용/재실행
-* `yargs` : node의 command-line argument, interface 관리 편의성 향상. 커맨드를 새로 만들거나 버젼을 
+- `nodemon` : node 파일 변경사항을 자동 적용/재실행
+- `yargs` : node의 command-line argument, interface 관리 편의성 향상. 커맨드를 새로 만들거나 버젼 editing하는데에 사용
+- `fs` : file system. 기본내장 패키지로 파일을 읽고 쓰는 등의 작업을 수행. 기본적으로 buffer단위로 입출력하므로, binary를 사용
 
+# ES-6
 
+### Arrow Function
+
+```javascript
+const f1 = function(x) {
+  return x * x
+}
+
+const f2 = x => {
+  return x * x
+}
+const f3 = () => x * x
+```
+
+위의 세 함수는 모두 같은 역할을 한다. **Arrow Function**은 이처럼 기존의 function을 간단하게 정의하는데에 사용될 수 있다.  
+그러나 이 때 Arrow Function의 작동원리에 대해 잘 숙지하자.
+
+```javascript
+const event = {
+  name: 'Re-invent day',
+  printSeminarListByFunc : function() => {
+    console.log('Seminar list for ' + this.name) // Seminar list for Re-invent day
+  }
+  printSeminarListByArrowFunc: () => {
+    console.log('Seminar list for ' + this.name) // Seminar list for undefined
+  }
+}
+
+event.printSeminarListByFunc()
+event.printSeminarListByArrowFunc()
+```
+
+위의 코드에서 일반적인 Function으로 정의한 `printSeminarListByFunc`와 달리, `printSeminarListByArrowFunc`는 this.name에 접근이 불가능하다(undefined).  
+이를 가리켜 **Arrow Function은 this를 binding하지 않는다**고 말한다.
+
+```javascript
+const event = {
+  name: "Re-invent day!",
+  seminarList: ["Lambda", "Gateway", "CloudWatch"],
+  // 바로 아래 코드는 function 키워드로 선언하는것과 동일하다.
+  printSeminarList() {
+    console.log("Seminar list for " + this.name)
+
+    this.seminarList.forEach(function(seminar) {
+      console.log(seminar + " is presented in " + this.name) // <seminar name> is presented in undefined
+    })
+    this.seminarList.forEach(seminar => {
+      console.log(seminar + " is presented in " + this.name) // <seminar name> is presented in Re-invent day
+    })
+  },
+}
+```
+
+이러한 특성 덕분에, Arrow Function은 외부의 Context를 그대로 함수에 가져와 수행할 수 있다.
+
+자세한 설명은 해당 문서를 참조하자.  
+[화살표함수 다시 살펴보기](https://ko.javascript.info/arrow-functions)
