@@ -141,5 +141,14 @@ module.exports = {
         path: `${__dirname}/src/z_`,
       },
     },
+
+    {
+      resolve:  'gatsby-plugin-robots-txt',
+      options: {
+        host: 'https://blogik.netlify.app/',
+        sitemap: 'https://blogik.netlify.app/sitemap.xml',
+        policy: [{ userAgent: '*', allow: '/' }]
+      }
+    },
   ],
 }
