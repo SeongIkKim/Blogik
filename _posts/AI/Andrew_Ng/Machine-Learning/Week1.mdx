@@ -1,0 +1,34 @@
+---
+title: Machine Learning 수강 정리 - Week 1
+date: 2020-12-06
+tags: [ML, AI, Coursera, Andrew Ng, Stanford]
+excerpt: Machine Learning Class by Andrew Ng, Stanford --Coursera Summary(20.12.07-21.03.01)
+---
+
+## Machine Learning
+
+Aruthr Samuel(1959) - 컴퓨터가 체스를 스스로 학습하도록 함
+Tom Michell(1998) - 특정 작업(T)에 대한 경험(E)과 성능측정(P)으로부터 컴퓨터 프로그램이 학습하는것
+
+> "A computer program is said to learn from experience E with respect to some class of tasks T and performance measure P, if its performance at tasks in T, as measured by P, improves with experience E."
+
+## Supervised / Unsupervised
+
+- `Supervised Learning` : 알고리즘에게 정답이 포함된 data set(Training Set)을 준 뒤, input과 output의 관계를 찾아 더 많은 정답을 예측해내는 학습방식
+  - Regression problem : output의 후보군이 연속적일 때
+  - Given a picture of a person, we have to predict their age on the basis of the given picture
+  - Classification problem : input의 사례들이 불연속적(이산적)일 때
+  - Given a patient with a tumor, we have to predict whether the tumor is malignant or benign.
+- `Unsupervised Learning` : 정답이 없는 데이터들을 clustering하여 structure를 규명하는것. 이때 예측의 결과에 기반한 피드백이 존재하지 않는다.
+  - Clustering: Take a collection of 1,000,000 different genes, and find a way to automatically group these genes into groups that are somehow similar or related by different variables, such as lifespan, location, roles, and so on.
+  - Non-clustering: The "Cocktail Party Algorithm", allows you to find structure in a chaotic environment. (i.e. identifying individual voices and music from a mesh of sounds at a cocktail party).
+
+---
+
+### 표기법
+
+- `x` : input 또는 feature(특성)
+- `y` : output 또는 "target" variable(예측값)
+- `(x,y)` : 하나의 Training example
+- `m` : Training example의 개수(즉, Training Set의 크기)
+- `h` : hypothesis, x에서 y까지 도달하는 과정(=지도)
