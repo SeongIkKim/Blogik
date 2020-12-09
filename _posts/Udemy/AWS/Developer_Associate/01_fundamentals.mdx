@@ -1,0 +1,173 @@
+---
+title: AWS Certified Developer Associate - 기초
+date: 2020-12-08
+tags:
+  [
+    Udemy,
+    AWS,
+    AWS Certified Developer Associate,
+    IAM,
+    EC2,
+    ENI,
+    Security Groups,
+  ]
+excerpt: Ultimate AWS Certified Developer Associate 2020 - Udemy 강의 정리
+---
+
+# Budgets
+
+AWS 서비스 사용 금액 제한, 알림 설정 등이 가능하다.
+
+# Availiablity Zones
+
+각 Region마다 최소 2개, 최대 6개, 평균 3개 정도 존재한다.  
+각 AZ는 redundant power, networking, connectivity를 가진 데이터센터들이 하나 이상 존재한다.  
+AZ들 간은 분리되어 있으면서도 높은 대역폭, 아주 낮은 지연도의 네트워킹으로 연결되어 있기때문에, 자연재해 등의 위협으로부터 안전하다.
+
+# IAM
+
+- Users - per physical person
+- Groups - contain users
+- Roles - per AWS resourece(Application)
+
+Regional Service가 아닌 Global Service이다.
+Permission은 JSON으로 작성된 Policies에 의해 관리된다.
+
+규모가 큰 기업의 경우 IAM user들을 모아서 own repositiory를 관리하는데, 이 경우 company credential로 AWS에 로그인할 수 있다.
+SAML standard를 사용한다고 한다.
+
+# EC2
+
+- 가상 머신(컴퓨터) 대여 - EC2
+- 가상 드라이브에 데이터 스토리징 - EBS
+- 머신간의 로드 분산 - ELB
+- auto-scaling group을 이용하여 service scaling - ASG
+
+### 과금
+
+최소 60초로 시작해서, 초 단위로 과금.  
+스토리지, 데이터 전송량, 고정 IP 사용, 로드 밸런싱 등의 요인에 따라 추가 과금.
+
+## AMI
+
+Linux 또는 Windows machine으로 own AMI를 만들어 인스턴스 base로 사용할 수 있으며, 기본적으로 제공하는 AMI도 많다.
+단, (cusmtom) AMI는 region 종속적이다.
+
+## Instance Lanch Types
+
+**5 distinct characteristics of Instances**
+
+- RAM (type, amount, generation)
+- CPU (type, make, frequency, generation, numbers of cores)
+- I/O (disk performance, EBS optimisations)
+- Network (network bandwidth, network latency)
+- Graphical Processing Unit (GPU)
+
+R/C/P/G/H/X/I/F/Z/CR 등은 RAM, CPU, I/O, Network, GPU 등에 특화된 인스턴스를 말한다.
+M은 Balanced type, T2,T3는 Burstable type.
+Burstable type은 예상치못한 traffic에도 대응할 수 있지만, load가 길어지면 효율이 떨어진다.  
+만약 안정적인 traffic이 예상되는 인스턴스가 있다면, burstable 이외의 다른 타입을 사용하는 것이 낫다.
+
+### On Demand
+
+- short workload, predictable pricing
+  - pay for what you use
+  - 가장 높은 비용, 후불제
+  - 단기간, application이 어떻게 동작할 지 모르는 un-interrupted workload에 사용
+
+### Reserved
+
+- On demand에 비해 cheap(최대 75% 할인), 1년 혹은 3년간 대여해야함
+- 약정기간에 대한 선불제, 특정 인스턴스 타입 사용
+- steady state usage application에 사용(database를 사용하는 경우처럼)
+
+- Reserved : long workload
+- Convertible Reserved : long workloads, 그러나 인스턴스 타입 변경 가능, 54%까지 할인
+- Scheduled Reserved : 예약해둔 시간대에만 런칭 - day, week, month 주기로 사용할 때
+
+### Spot
+
+- short workload, cheap(최대 90% 할인), 그러나 유실 위험(less reliable) if your max pirce is less than current spot price
+- 가장 비용효율적인 서비스
+- failure에도 회복성이 있는 workload에 사용(DB나 중요한 서비스에는 사용X)
+  - Batch jobs
+  - Data analysis
+  - Image processing
+  - 이외에도 실패하면 그냥 다시 시도하면 되는 workload들
+
+### - Dedicated
+
+- Dedicated Instances : 다른 사용자와 하드웨어를 공유하지 않는 타입
+
+  - 해당 사용자에게 할당되므로, 같은 계정의 다른 인스턴스와는 하드웨어 공유 가능
+  - 인스턴스 위치에 대해서는 컨트롤 불가(Stop/Start 이후에만 가능)
+
+- Dedicated Hosts : 물리 서버를 전적으로 예약해서, 인스턴스 위치까지 지정하는 타입
+  - 내부 소켓, 하드웨어 코어까지 확인 가능
+  - EC2 인스턴스 자체에 대한 Full control
+  - 3년간 계약
+  - 비쌈
+  - complicated licensing model을 가지고 있는 software에 적합 (BYOL - Bring Your Own License)
+  - 또는 strong regulatory 또는 compliance needs의 기업들에게 적합
+
+### 이상적인 조합
+
+Base : Reserved Instance
+peaks : On-Demand & Spot
+
+## SSH(Secure SHell)
+
+Mac, Linux, Windows 10이상에서 지원하는 프로토콜(또는 해당 프로토콜을 사용하는 유틸리티 자체)  
+원격지에 있는 컴퓨터 접속시 사용
+
+## Security Group
+
+EC2 인스턴스의 Firewall 역할. 인스턴스 외부에 존재한다.  
+여러 인스턴스에 매칭 될수 있으며, region, VPC 제한을 걸수도 있다.  
+디폴트로 모든 inbound traffic이 block되어있으며, 모든 outbound traffic은 반대로 authorized 되어있다.
+
+<Info>SSH 액세스를 위한 Security Group을 하나만 만들어 놓는것이 좋다.</Info>
+<Info>
+  Application 접속시 "time out" 에러가 뜬다면, Security Group 이슈이다. 그러나
+  "connection refuesd" 에러가 뜬다면 application의 문제이거나, 인스턴스 런칭이
+  안된 것이다.
+</Info>
+
+## Private/Public IP(IPv4)
+
+- Public IP
+  - Internet(WWW)에서 사용되는 machine 식별자
+  - Whole Web에서 unique해야함
+  - IP를 통해 machine 위치를 특정할 수 있음
+- Private IP
+  - Private network 내에서 machine을 구분하는 식별자
+  - 사설망 내부에서만 unique함
+  - Internet Gateway(proxy)를 통해 WWW에 machine을 연결할 수 있다
+  - 특정 IP 범위만 Private IP로 사용됨
+- Elastic IP
+  - EC2 인스턴스는 restart할 때마다 Public IP가 바뀌는데, 이를 고정해두기 위해 Elastic IP를 할당받아 사용
+  - Public IPv4 IP로, 계정당 최대 5개까지만 할당 가능하다.
+  - Elastic IP를 이용해서, 한 인스턴스나 소프트웨어가 오동작할 시 계정 내의 다른 인스턴스로 즉시 address를 remapping할 수 있음.
+  - 그렇지만 아키텍쳐 구성에 문제가 되는 경우가 많기 때문에, EIP보다는 차라리 **randome public ip를 사용하고 DNS name을 붙이는 것을 추천**
+  - 또는, **public IP를 아예 사용하지 않고 Load Balancer를 사용**하는 것이 Best Practice라고 알려져있다.
+
+## User Data
+
+EC2 인스턴스에 bootstrapping script를 추가하여, 최초 실행시에 단 한번만 실행하도록 설정할 수 있다.
+해당 script는 root user가 수행하므로, sudo 권한을 가진다.  
+일반적으로 업데이트 설치, 소프트웨어 설치, 인터넷에서 파일 다운로드 등을 위해 사용된다.
+
+## Elastic Network Interfaces(ENI)
+
+virtual network card를 의미하는 VPC의 logical component로, EC2 외부에 있으며, 특정 Availiablity Zone(AZ)에 종속적이다.
+EC2가 네트워크에 접속할 수 있도록 해주는 역할을 한다.
+다음과 같은 특성을 가진다.
+
+- Primary private IPv4, one or more secondary IPv4
+- One Elastic IP (IPv4) per private IPv4
+- One Public IPv4
+- One or more security groups
+- A MAC Address
+
+EC2 인스턴스와 독립적으로도 생성가능하며, EC2 인스턴스에 붙일수 있다(for failover).
+이처럼 쉽게 attach/detach 할 수 있는 특성 덕에 IP Address들과 Security 그룹을 묶어서 적용하고 관리하기에 용이하다.
