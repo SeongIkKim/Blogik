@@ -16,7 +16,7 @@ const config = {
   author: `욕심많은 알파카`,                             // Name shows on profile
   profileDescription: "알파카의 Always Awake Devlog",   // Shows under author name
   profileImageName: `profile.jpeg`,                  // Place profile.jpg/.jpeg/.png in _assets folder
-  location: "",                                      // Location under profileDescription. "" --> disabled
+  location: "Seoul",                                      // Location under profileDescription. "" --> disabled
   footerLink: "https://github.com/SeongIkKim",                                    // Link to page when you click footer name
 
   /* Social Media Links
@@ -24,13 +24,13 @@ const config = {
       showHeaderIcon: shows social media icon in header. When true, must have account name set
   ========================================= */
   socialMediaLinks: {
-    email:     { emailAddress: "kpic1638@gmail.com", showHeaderIcon: true },
-    github:    { accountName: "SeongIkKim", showHeaderIcon: true },
-    facebook:  { accountName: "", showHeaderIcon: false },
-    twitter:   { accountName: "", showHeaderIcon: false },
-    instagram: { accountName: "", showHeaderIcon: false },
-    linkedIn:  { accountName: "", showHeaderIcon: false },   // Use URL after "linkedin.com/"
-    medium:    { accountName: "", showHeaderIcon: false },   // Use URL after "medium.com/@"
+    email: { emailAddress: "kpic1638@gmail.com", showHeaderIcon: true },
+    github: { accountName: "SeongIkKim", showHeaderIcon: true },
+    facebook: { accountName: "", showHeaderIcon: false },
+    twitter: { accountName: "", showHeaderIcon: false },
+    instagram: { accountName: "seongik_k", showHeaderIcon: true },
+    linkedIn: { accountName: "", showHeaderIcon: false },   // Use URL after "linkedin.com/"
+    medium: { accountName: "", showHeaderIcon: false },   // Use URL after "medium.com/@"
   },
 
   /* Social Media Share Buttons--available below every post
@@ -47,10 +47,10 @@ const config = {
 
   /* More Custom Settings
   ========================================= */
-  defaultTheme: "light",                      // Options: dark / light -- applied to first visitors
+  defaultTheme: "dark",                      // Options: dark / light -- applied to first visitors
   showTimeToRead: false,                      // Shows time to read for each post in main page
   breakCodeLines: true,                      // Breaks long code lines instead of having horizontal scroll
-  faviconSrc: `_assets/icon-code.png`,        // Favicon
+  faviconSrc: `_assets/icon-camel.png`,        // Favicon
   gaTrackingId: `G-E4NQV7DLZX`,                           // Your google analytics tracking id--i.e. UA-*****
   googleAdSenseId: ``,                        // Your google AdSense client id--i.e. ca-pub-****
 }
