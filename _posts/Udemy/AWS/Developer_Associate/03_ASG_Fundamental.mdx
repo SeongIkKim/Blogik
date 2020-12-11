@@ -1,0 +1,70 @@
+---
+title: AWS Certified Developer Associate - ASG
+date: 2020-12-09
+tags: [Udemy, AWS, AWS Certified Developer Associate, ASG, Scaling]
+excerpt: Ultimate AWS Certified Developer Associate 2020 by Stephane Maarek
+---
+
+# Auto Scaling Group(ASG)
+
+Scaling : 웹사이트와 어플리케이션의 가변적인 로드량에 맞추기 위해 cloud 환경에서 server를 빠르게 만들고 삭제하는 것
+
+- Load가 늘어나면 Scale out, 줄어들면 Scale in
+- machine의 최소, 최대 갯수도 설정할 수 있다.
+- 자동적으로 load balancer에 instance를 생성해 연결해준다.
+
+### 팁
+
+과금되지 않는 서비스이다. ASG 내부의 리소스들에 대해서만 과금한다.  
+ASG의 IAM role은 내부의 instances에게 적용된다.  
+ASG를 사용한다는 것은 인스턴스가 모종의 이유로 삭제되더라도 즉시 대체 리소스를 생성한다는 이야기이므로, Extra Safety를 보장한다.  
+LB로부터 unhealty 판정을 받은 instances를 삭제하고 재생성할 수 있다.
+
+## Attribute
+
+- Launch Configuration
+  - AMI + Instance Type
+  - EC2 User Data
+  - EBS Volumes
+  - Security Groups
+  - SSH Key Pair
+- 최소 사이즈, 최대 사이즈, 초기 capacity
+- Network + Subnets 정보
+- Load Balancer 정보
+- Scaling Policies
+
+## Auto Scaling Alarms
+
+`CloudWatch` alarm에 따라 ASG의 scaling을 설정할 수 있다.
+Alarm은 ASG 인스턴스들 전체의 지표를 주시하고 이를 ASG에 알린다.
+ASG는 이에 따라 Scaling(out, in)을 수행한다.
+
+- 효과적인 Auto Scaling rules based on...
+  - Target Average CPU Usage
+  - Numbers of requests of the ELB per instance
+  - Average Network In
+  - Average Network Out
+  - 설정하기도 쉽고 합리적이다.
+
+Custom Metrics도 사용할 수 있다.  
+_EC2의 custom metrics -> CloudWatch(PutMetric API) -> CloudWatch Alarm -> ASG Scaling_
+
+## Scaling Policies
+
+- Target Tracking Scaling
+  - 가장 쉽고 간단한 방식
+  - ex) average ASG CPU 사용률을 40%로 두고 싶을 때
+- Simple / Step Scaling
+  - ex) CloudWatch alarm이 작동하면 n개의 unit을 추가한다
+  - ex) CloudWatch alarm이 작동하면 unit U를 제거한다
+- Scheduled Actions
+  - 알고 있는 사용패턴에 맞추어서 예측 scaling
+  - ex) 금요일 10시부터 5시까지 최소 용량을 늘릴것
+
+### Scaling Cooldown
+
+- 이전의 scaling 작업이 끝나기 전까지 추가적인 scaling을 하지 않는다 -> 이를 Cooldown이라고 부름
+- default cooldown말고도 특정 simple scaling policy에 적용되는 scaling-specific cooldown을 만들 수 있음
+- scaling-specific cooldown은 default cooldown period를 override함
+- default cooldown은 300초, 만약 더 짧게 하고 싶다면 scaling policy에 scaling-specific cooldown을 180초로 설정하면 됨.
+- 너무 많이 scaling한다면 cool-down period와 CloudWatch Alarm 시간을 조정할것

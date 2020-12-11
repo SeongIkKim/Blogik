@@ -1,0 +1,170 @@
+---
+title: AWS Certified Developer Associate - ELB
+date: 2020-12-08
+tags: [Udemy, AWS, AWS Certified Developer Associate, ELB, SSL/TLS, SNI]
+excerpt: Ultimate AWS Certified Developer Associate 2020 by Stephane Maarek
+---
+
+# ELB(EC2 Load Balancer)
+
+## 개요
+
+### Load Balancer란?
+
+인터넷 트래픽을 다수의 (EC2) 서버에 분산시켜 흘려보내는 서버
+
+### Load Balancer를 사용하는 이유
+
+- multiple downstream instance에 load를 분산시켜 흩뿌려준다
+- application에 Single Access Point(DNS)를 만들 수 있다
+- downstream instances의 failure를 매끈하게(Seamlessly) 핸들링할 수 있다
+- 인스턴스의 정기적인 상태 체크가 가능하다
+- SSL termination(HTTPS)를 제공한다
+- 쿠키의 stickiness를 강제한다
+- High Availiablity across Zones
+- public traffic과 private traffic을 분리할 수 있다
+
+### 왜 ELB를 사용해야 하는가?
+
+- AWS 공식 managed load balancer이기 때문에
+  - 작동이 보장되고, AWS에서 upgrade, maintenance, high availability, configuration knobs를 지원한다.
+- 직접 load balancer를 운용하는것보다 훨씬 싸다(...)
+- 비용이 조금 더 들지만, 그냥 own load balancer를 운용하는 것보다 노력이 절감된다.
+- 다양한 AWS 리소스와 궁합이 잘 맞다
+
+### Good to Know
+
+**Troubleshooting**
+
+- 4xx error : client측 에러
+- 5xx error : application측 에러
+- 503 error : capacity가 부족하거나, registered target이 없다는 말
+- LB와 application이 연결되지 않으면 security group을 체크할 것
+
+**Monitoring**
+
+- ELB access log에 모든 access request가 저장됨(따라서 request별로 debug할 수 있음)
+- CloudWatch Metrics에서 aggregate statistics 확인 가능(ex: connections count)
+
+<Warning>
+  LB는 즉각적인 Scaling이 힘들다. 만약 필요하다면 AWS에 "warm-up"을 요청하도록
+  하자.
+</Warning>
+
+## Health Checks
+
+- crucial for LB
+- forward traffic에 대한 response를 적절히 전달해 줄 수 있는지 LB가 인스턴스를 체크하는 개념
+- port와 route를 이용하여 진행된다(`/health` 명령어)
+
+## Types
+
+일반적으로 Application Load Balancer(v2)를 사용하는 것 권장.  
+Internal(private) / External(public) ELB도 설정할 수 있음.
+
+### 1.Classic Load Balancer(v1 - old generation) - 2009
+
+- HTTP&HTTPS(Layer 7), TCP(Layer 4)
+
+### 2.Application Load Balancer(v2 - new generation) - 2016
+
+- HTTP, HTTPS, WebSocket(전부 Layer 7)
+- target group 내의 machine들 간의 HTTP application 로드밸런싱
+  - URL내의 path, hostname에 따라 / Query String, Headers에 따라 Routing
+- 단일 machine 내에서도 multiple application을 로드밸런싱 (ex - containers)
+- HTTP/2와 WebSocket을 지원
+- redirect 기능 지원(ex - HTTP to HTTPS)
+- micro services & container-based application에 적합 (ex - `Docker` & `Amazon ECS`)
+- `ECS`의 dynamic port로 redirecting해주는 port mapping 기능 지원
+- 기존의 CLB는 애플리케이션 당 하나가 필요했지만, ALB는 한 대로 여러 애플리케이션을 다룰 수 있다.
+
+**Good to Know**
+
+- Fixed hostname(XXX.region.elb.amazonaws.com)
+- applicaiton server는 client의 IP를 directly하게 볼 수 없고, LB의 IP(private)만 보게 된다.
+  - 클라이언트의 진짜 IP는 header X-Forwarded-For에 삽입된다.
+  - Port(X-Forwarded-Port)와 Proto(X-Forwarded-Proto)에서도 확인할 수 있다.
+
+ALB를 생성하고 난 뒤, Listener 탭에 들어가 rule을 정하여 target group에 routing / redirecting 등을 할 수 있다.
+
+<Primary>
+  LB가 모든 외부 request를 받는 하나의 endpoint로 동작하게 하고싶다면, LB의
+  inbound를 80/443에 대해 열어놓는다. 이후, EC2 인스턴스의 inbound에서 LB의
+  security group을 http/https에 추가시킨다.
+</Primary>
+<Info>
+  Target Group : Auto Scaling Group에 의해 managing되는 EC2 Instances / ECS
+  tasks / Lambda Functions / IP Addresses(private) 등의 묶음. ALB는 여러개의
+  target group에 route할 수 있고, Health Check도 target group 단위로 수행됨.
+</Info>
+
+### 3. Network Load Balancer(v2 - new generation) - 2017
+
+- TCP, TLS (secure TCP) & UDP (전부 Layer 4)
+  - Forwad TCP & UDP traffic만 허용
+  - 초당 수 백만개의 request 처리
+  - latency ~100ms(vs 400 ms for ALB)
+  - 따라서 extreme performance를 위해 사용된다
+- **AZ당 1개의 static IP**를 지원, `Elastic IP` 할당 지원(특정 IP whitelisting에 유용)
+- AWS free tier에 포함되어 있지 않음
+
+## Stickiness
+
+CLB의 경우 Load Balancer attribute에서, ALB의 경우 Target Group attribute에서 선택
+
+- 같은 client가 Load Balancer를 거칠 때 항상 동일한 instance로 연결되도록 할 수 있다.
+- Client가 session data를 잃지 않고 접속하도록 하기 위해 Stickiness를 확보한다.
+- cookie를 사용하여야 하며, cookie는 expiration date를 가진다.
+- Stickiness를 허용할 경우 EC2 instance 로드량의 불균형해지기도 한다.
+- CLB와 ALB만 존재.
+
+## Cross-Zone Load Balancing(옵션)
+
+Load Balancing 시 로드가 모든 AZ에 있는 Instances로 균일하게 분산된다.  
+이 옵션을 켜놓지 않으면 Load Balacer와 같은 AZ안에 있는 Instances에 대해서만 Load Balancing 수행.
+
+- CLB
+  - default : 비활성화
+  - 활성화 하더라도 inter AZ 간의 data 이동 시 과금 X
+- ALB
+  - default : 활성화(비활성화 불가)
+  - inter AZ 간의 data 이동 시 과금 X
+- NLB
+  - default : 비활성화
+  - 활성화하면 inter AZ 간의 data 이동 시 과금
+
+## SSL/TLS - Basics
+
+`SSL` : Secure Sockets Layer, 연결을 암호화하는 데에 사용됨  
+`TLS` : Transport Layer Security, SSL보다 신식
+
+요새는 대부분 TLS 인증서를 사용하지만, 아직도 SSL이라고 부른다.
+
+Public SSL은 Certificate Authorities(CA)에 의해 발행된다.  
+또한, 만료기한을 (직접) 정해야하기 때문에, 갱신해 줄 필요가 있다.
+
+Load Balancer는 X.509 Certificate를 사용하며, 인증서들은 `ACM(AWS Certificate Mangaer)`에서 관리할 수 있다.
+물론, 가지고 있는 인증서를 직접 올릴수도 있다.
+
+**HTTPS Listener**
+
+- default 인증서를 선택해야 한다.
+- 여러 도메인을 지원하기 위해 인증서를 선택적으로 추가할 수도 있다.
+- **Client는 도달하는 hostname을 specify하기위해 SNI(Server Name Indication)를 사용한다.**
+- 구 버전의 SSL/TLS(legacy clients) 지원을 위해 security policy를 specify할 수 있음
+
+## Server Name Indication(SNI)
+
+한 웹 서버 내에 여러 개의 websites를 serving하기 위해서 여러 개의 SSL 인증서를 로드해야하는 문제를 해결해준다.
+
+Newer 프로토콜이며, client는 최초의 SSL handshake에서 target server의 hostname을 명시(indicate)해야한다.
+그 이후 서버는 알맞은 인증서를 찾아 로드시켜주거나, 또는 default 인증서를 로드한다.
+
+SNI는 ALB와 NLB, `CloudFront`에서만 작동한다. (CLB는 older gen이라 지원하지 않는다)
+
+- CLB
+  - 하나의 SSL 인증서만을 지원한다
+  - 여러 SSL 인증서를 가진 multiple hostname을 지원하기 위해서는 CLB를 여러 대 만들어야 한다.
+- ALB, NLB
+  - 여러 개의 SSL 인증서를 위한 muitiple listener를 지원한다.
+  - 이를 위해 `SNI`를 사용한다.

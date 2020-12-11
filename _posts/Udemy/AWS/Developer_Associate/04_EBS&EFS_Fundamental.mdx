@@ -1,0 +1,151 @@
+---
+title: AWS Certified Developer Associate - EBS & EFS
+date: 2020-12-11
+tags: [Udemy, AWS, AWS Certified Developer Associate, EBS, EFS, Instance Store]
+excerpt: Ultimate AWS Certified Developer Associate 2020 by Stephane Maarek
+---
+
+# Elastic Block Store(EBS) Volume
+
+EC2가 삭제될 때 EC2의 root volumne(메인 드라이브)도 같이 삭제된다.  
+따라서 예상치 못한 이유로 EC2가 삭제된다면 root volume의 내용물을 잃게 되는데, 이를 안전히 백업해두려면 `EBS Volume`을 사용하면 된다.  
+즉, `EBS Volume`은 인스턴스가 running 중일 때 붙일 수 있는, 독립적인 network drive이다.
+
+## 개요
+
+- 물리적 drive가 아닌 network drive이다.
+  - 따라서 instance와 data를 주고 받는데에 latency가 조금 있다.
+  - 하나의 EC2 인스턴스에 종속되지 않고, 떼어서 다른 인스턴스에 빠르게 붙일 수 있다.
+- AZ 종속적이다.
+  - volume을 다른 AZ로 옮기려면, snapshot을 떠야한다.
+- Provisioned capacity를 가지고 있다(GB 단위, IOPS)
+  - 신청 용량 개념인 provisioned capacity에 따라 과금한다.
+  - 추후에 추가적으로 capacity를 늘릴수도 있다.
+  - 따라서, 첫 신청에는 되도록 작게 provisioned capacity를 신청했다가, 필요할 때 늘리는 것이 좋다.
+
+## Types
+
+총 4가지 타입이 있다.
+
+1. **GP2(SSD)** : 다양한 workload에 대해 사용되며, 가격, 성능 밸런스가 좋은 범용 SSD 볼륨
+
+- 용도 - 대부분의 workload, 시스템 부트 볼륨, 가상 데스크탑, Low-latency interactive app, 개발과 테스트 환경
+- 용량 - 1GiB ~ 16TiB
+- Small gp2의 경우 IOPS 최대 3000까지 burst 가능, Max IOPS는 16,000
+- GB 당 IOPS가 3이므로, size를 100으로 설정시 최소 IOPS 300
+
+2. **IO1(SSD)** : low-latency나 high-throughput workload가 필요한 중요 업무에 사용하는 고성능 SSD 볼륨
+
+- 용도 - 지속적인 IOPS 성능이나, 한 볼륨에서 16,000 IOPS(gp2의 한계)를 넘어서는 중요 비즈니스 애플리케이션에 사용
+- 커다란 db workload에 사용 - 예시) MongoDB, Cassandra, Microsoft SQL Server, MySQL, PostgreSQL, Oracle
+- 용량 - 4GiB ~ 16TiB
+- 최소 IOPS 100, 최대 64,000(Nitro instance 한정) or 32,000(Nitro instance 제외 다른 instances)
+- provisioned IOPS 최대 비율은 volume 대비 50배
+
+3. **ST1(HDD)** : 자주 액세스되고, 대용량 데이터 처리 등의 throughput-intensive workload에 사용하는 저비용 HDD 볼륨
+
+- 용도 - 저비용,지속적,빠른 throughput을 제공해야하는 스트리밍 workload / Big data, Data warehouses, Log processing, Apache Kafka
+- Boot volume으로는 사용 불가
+- 용량 - 500 GiB ~ 16TiB
+- Max IOPS 500
+- Max throughput 500 MiB/s - burst 가능
+
+4. **SC1(HDD)** : 적은 액세스 빈도의 workload에 사용되는 최저비용 HDD 볼륨
+
+- 용도 - 자주 Access되지 않는 대용량 데이터를 위한 Throughput-oriented 스토리지
+- 스토리지의 비용 절감이 최우선일때
+- Boot volume으로는 사용 불가
+- 용량 - 500 GiB ~ 16 TiB
+- 최대 IOPS 250
+- 최대 throughput 250 MiB/s - burst 가능
+
+EBS 볼륨은 Size | Throughput | IOPS(I/O Per Sec) 등의 기준으로 Characterized 되어있다.
+
+[2020 Re-invent에서 GP3, IO2 EBS 타입이 추가되었다.]
+
+## 사용법
+
+[Making an Amazon EBS Volume available for use on Linux](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html) 참조.
+
+## EBS vs Instance Store
+
+어떤 인스턴스들은 Root EBS volume이 아닌 `Instance Store(임시 스토리지)`를 달고 있다.  
+Instance Store는 EBS와 달리 machine에 **물리적으로 붙어있는 store**이며, 다음과 같은 특징을 지닌다.
+
+- 장점
+  - I/O 성능이 더 뛰어나다(Network가 아니라 물리적으로 연결된 drive이므로) - 최대 million 수준의 IOPS를 지원한다(very very high)
+  - buffer, cache, stratch data, temporary content에 좋다.
+  - 리부팅해도 Data가 살아있다.
+- 단점
+  - 인스턴스 정지나 제거시, instance store가 사라진다.
+  - 용량 조정이 불가능하다.
+  - 유저가 직접 백업해야한다.
+- EBS처럼 Block Storage이므로, File system을 가지고 있다.
+- Instance에 연결되면 size를 변경할 수 없다.
+- **하드웨어에 문제가 생기면 data loss 위험이 있다**
+
+---
+
+# Elastic File System(EFS)
+
+EC2에 마운트 될 수 있는 Managed NFS(Network File System)을 의미한다.  
+EFS는 여러 AZ에 있는 EC2 instance 간에 작동할 수 있다. 가용성과 확장성이 높고, 비싸다(gp2의 3배가량). 사용한 만큼 과금한다.
+
+- 용도 : content management, web serving, 데이터 공유, 워드프레스 등
+- NFSv4.1 protocol을 사용한다.
+- EFS에 접근할 수 있는 security group을 사용해야한다.
+- Linux 기반 AMI에서만 호환가능하다.(Windows는 사용 불가)
+- KMS 키를 이용하여 암호화 at rest
+- POSIX file system(~Linux)
+- 자동으로 scaling하며, 사용한만큼 내고, capicty planning이 없다.
+
+### 성능 / 스토리지 클래스
+
+- Scale
+  - 최대 약 1000명의 동시접속 client 수용, 10GB 이상의 throughput
+  - 페타바이트 수준까지 자동 scaling
+- Performance mode(생성 시 설정)
+
+  - 범용(default) : latency가 중요한 경우 사용(web server, CMS, etc)
+  - Max I/O : hight latency, throughput, highly parallel (big data-or file-, media processing)
+
+- Storage Tiers(lifecycle management feature - n일 이후 file을 이동)
+  - Standard : 자주 액세스하는 파일일 경우
+  - Infrequent access(EFS-IA) : 저장하는데는 더 적은 비용이 들고, retrive 시 비용 부과(lifecycle이 30일 초과일경우)
+
+## 사용법
+
+[Using amazon-efs-utils](https://docs.aws.amazon.com/efs/latest/ug/using-amazon-efs-utils.html) 참조  
+해당 `EFS` 세부 항목의 Attach를 참조할 것.
+
+<U>
+  EFS security group의 inbound로 NFS 프로토콜의 EC2 instance security group을
+  추가시켜주는걸 잊지말자!
+</U>
+
+---
+
+## EBS vs EFS
+
+**EBS Volume**
+
+- 특징
+  - 한번에 최대 하나의 instance에만 붙일 수 있다.
+  - AZ 종속적이다.
+  - gp2 : disk size가 증가하면 I/O가 증가한다
+  - io1 : IO를 독립적으로 올릴 수 있다.
+- 타 AZ로 EBS를 옮기려면...
+  - Snapshot을 만든다
+  - 다른 AZ에서 Snapshot을 복구한다.
+  - 이 떄, EBS backup이 IO를 사용하므로 application이 많은 양의 traffic을 감당하고 있는 중에는 시도가 불가능하다.
+- Root EBS Volume은 EC2가 삭제되면 같이 삭제된다(이 옵션은 해제할 수 있다)
+
+**EFS**
+
+- 여러 AZ에 걸쳐 100 여개의 인스턴스를 연결할 수 있다.
+- WordPress 같은 웹사이트 파일을 share할 수 있다.
+- Linux Instance만 사용할 수 있다(POSIX)
+- EBS보다 비싸다
+- EFS-IA를 사용해 비용을 절감할 수 있다.
+
+<U>EFS, EBS, Instance Store의 차이점을 잘 기억해 둘 것!<U>
