@@ -6,7 +6,7 @@ const config = {
   ========================================= */
   title: `aalphaca's devlog`,          // Displayed in header
   description: `Always Awake`,     // Site description
-  maxWidth: "768px",                  // Max width of website
+  maxWidth: "1024px",                  // Max width of website
   enableAbout: true,                  // Enables about page
   siteUrl: `https://blogik.netlify.app/`, // For sitemap & RSS feed
   useScrollIndicator: true,           // Use scroll indicator on top of screen in posts
