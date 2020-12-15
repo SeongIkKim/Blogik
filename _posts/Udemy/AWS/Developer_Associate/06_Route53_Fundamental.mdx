@@ -1,0 +1,112 @@
+---
+title: AWS Certified Developer Associate - Route 53
+date: 2020-12-15
+draft: False
+tags: [Udemy, AWS, AWS Certified Developer Associate, Route 53, DNS]
+excerpt: Ultimate AWS Certified Developer Associate 2020 by Stephane Maarek
+---
+
+# Route 53
+
+Managed DNS(Domain Name System)이다.  
+소유한 public domain을 구매/사용하거나, VPC 내부의 인스턴스들에 private domain을 붙이기 위해 사용된다.  
+Hosted zone마다 월 0.5달러가 과금되는 상품이다.
+
+<Info>
+  DNS란? domain name을 통하여 client가 서버로 접속하도록 하는 rules와 records의
+  collections이다.
+</Info>
+
+AWS에서 흔히 사용하는 records의 종류는 다음과 같다.
+
+- `A` : hostname to IPv4
+- `AAAA` : hostname to IPv6
+- `CNAME` : hostname to hostname
+- `Alias` : hostname to AWS resource
+
+## 특징
+
+- DNS를 통한 Load Balancing 지원 - client load balacing이라고 불린다.
+- Health checks
+  - n개의 health check 통과시 health 처리 (default 3)
+  - default 간격 30초(10초로 변경시 추가 요금 부과)
+  - _endpoint health check에 15개의 checker가 따라붙음. -> 하나의 인스턴스를 2초마다 체크하는 셈_
+  - TCP, HTTP, HTTPS 사용가능(단, SSL verification 제공하지 않음)
+  - health check를 `CloudWatch`에 통합하여 사용할수도 있음.
+  - **Route53 DNS 쿼리에 연결할 수도 있다!**
+- Routing Policy : simple, failover, geolocation, latency, weighted, multi value
+
+## Time To Live(TTL)
+
+Web browser가 Route53에 DNS request를 보내면, Route53은 해당 Domanin Name에 맞는 IP 주소를 반환한다.
+이 때, Route53의 TTL 옵션에 따라 컴퓨터 네임 서버에 유지시간이 있는 DNS Cache를 업데이트한다.
+
+이후 유지 시간이 끝날 때까지, Route53을 거치지 않고도 캐시값을 확인해 IP주소로 바로 접속할 수 있다.
+
+24시간씩 되는 high TTL의 경우, DNS의 트래픽을 줄일 수 있지만 outdated 되기 쉽다.
+이와 반대로 60초 정도의 low TTL의 경우, outdate한 시간은 적어지지만 좀 더 많은 traffic이 생긴다.
+
+<Info>
+  TTL은 Route53에만 사용되는 개념이 아니라, DNS의 중요한 feature 중 하나이다.
+</Info>
+
+## CNAME vs Alias
+
+`Load Balancer`, `CloudFront`같은 AWS 리소스에는 AWS hostname이 붙어있다(ex- `lb1-1234.ap-northeast-2.elb.amazonaws.com`).
+
+이 리소스들에 hostname 대신 내가 소유하고 있는 domain을 붙이려면, `CNAME`
+
+- `CNAME`
+  - 한 hostname이 다른 hostname을 가리키도록 한다. ex) app.mydomain.com -> abc.anything.com
+  - **단, 루트 도메인이 아닌 경우에만 사용 가능하다**. ex) something.mydomain.com
+- `Alias`
+  - hostname이 **AWS 리소스**를 가리키도록 한다. ex) app.mydomain.com -> abc.amazonaws.com
+  - **루트 도메인일 경우에만 사용 가능하다.** ex) ex) mydomain.com
+  - 과금이 되지 않는다.
+  - native health check를 제공한다.
+
+## Routing Policy
+
+### Simple
+
+단일 리소스에 연결할 때 사용하며, health check를 붙일 수 없다.  
+여러개의 value를 지정해놓으면, 랜덤하게 하나가 client에 연결된다.
+
+### Weighted
+
+requests를 퍼센트(%) 단위로 쪼개어 특정 endpoint로 연결 시킬 수 있다.  
+예를 들어, 70%는 엔드포인트 A에, 20%는 엔드포인트 B에, 10%는 엔드포인트 C에 보낼 수 있다.
+
+새로운 앱 버젼을 1%의 사용자에게 테스트해보거나, 두 지역간에 트래픽을 나눌때에 유용하다.
+
+Health Checks 옵션도 조합하여 사용할 수 있다.
+
+### Latency
+
+최소 지연속도를 가지는 주변의 서버로 리다이렉트해준다.
+이 때, **지연속도는 AWS Region 단위로 측정된다.**
+유럽과 아메리카쪽은 대부분 미국쪽 서버로, 아시아 태평양 지역은 대부분 도쿄지역으로 리다이렉트된다고 한다.
+
+응답속도가 최우선순위인 경우에 유용하다.
+
+### Failover
+
+Primary와 Secondary를 두고, Primary를 health check하다가(필수옵션), Failover 시 Secondary로 전환시켜주는 policy.
+
+Secondary는 기본적으로 Disaster Recovery에만 사용된다.
+
+### Geolocation
+
+Latency base와는 다르게, **유저의 위치만을 기준으로 라우팅**한다.
+예를 들어, 미국 지역의 traffic을 전부 특정한 IP로 보내는 형태.
+
+설정에 없는 location을 대비하여 default policy를 필수로 설정해주어야 한다.
+
+### Multi Value
+
+여러 개의 리소스로 트래픽을 라우팅하면서, 레코드에 Route53 health check를 붙이고 싶을때 사용한다.
+
+각 multi value query마다 최대 8개의 healthy record가 반환된다.
+요청을 보내면, healthy한 리소스들만 반환해준다.
+
+**Multi Value는 로드밸런싱에도 사용되지만, ELB의 대체품이 아니다.**
