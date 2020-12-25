@@ -1,0 +1,66 @@
+---
+title: Docker 마스터리  - 컨테이너 기초
+date: 2020-12-26
+tags: [Udemy, Docker]
+excerpt: Docker Mastery with Kubernetes + Swarm from a Docker Captain 정리 - Udemy
+---
+
+### 일반적인 도커 커맨드 형식 : `docker <command> <sub-command> [-options]`
+
+old version에서 사용하던 형식인 `docker <command> [-options]`도 작동한다.
+
+### 명령어 훑고 지나가기
+
+- `docker version` : 도커 버젼 확인 및 cli와 engine의 연결 확인
+- `docker info` : engine의 config 정보 확인
+
+<Info>
+  Docker Engine : docker 서버로, 머신의 백그라운드에서 상시 돌아가고 있는
+  service(in Mac,Linux) 또는 daemon(in Windows)같은 존재. 사용자가 도커 명령어를
+  입력하면, 이를 해석하여 머신에 전달한다.
+</Info>
+
+# 컨테이너(Container)
+
+## 이미지와 컨테이너의 차이
+
+- 이미지는 구동하고싶은 어플리케이션이다 (ex- Nginx 웹 서버)
+- 컨테이너는 프로세스로 구동하는 이미지 인스턴스이다
+- 같은 이미지를 기반으로, 여러 컨테이너를 만들 수 있다.
+- 도커의 기본 이미지 레지스트리(registry)는 Docker Hub로 불린다.
+
+## Docker로 Nginx 서버 띄워보기
+
+`docker container run --publish 80:80 nginx`
+
+1. 'nginx' 이미지를 도커 허브에서 다운받는다.
+2. 해당 이미지로 컨테이너를 생성한다.(`run` 명령어는 새로운 컨테이너를 "생성"한다)
+3. host IP에 대하여 80 포트를 개방한다.
+4. 트래픽을 컨테이너 IP의 포트 80으로 라우트한다.
+
+- `docker container ls` : 현재 컨테이너 리스트 확인
+- `docker container stop [ID | NAME]` : 컨테이너 구동 종료
+- `docker container logs [ID | NAME]` : 컨테이너의 로그 확인
+- `docker container top [ID | NAME]` : 현재 실행중인 프로세스 표시
+- `docker container rm [ID | NAME]` : 해당 컨테이너 삭제. stop과 동시에 삭제하고 싶다면 -f(force) 옵션 사용
+
+<Info>
+  run 명령어는 항상 새로운 컨테이너를 생성한다. 기존에 존재하는 컨테이너를
+  구동시키고 싶으면, start 명령어를 사용한다.
+</Info>
+
+### `docker container run` 시에 어떤 일이 일어나는 걸까?
+
+해당 커맨드를 입력하면, 다음의 과정들이 일어난다.
+
+1. 해당 이미지를 로컬 이미지 캐시에서 탐색하고, 실패한다.
+2. 따라서 디폴트로 설정되어 있는 도커 허브에서 원격 이미지 레포지토리를 탐색한다.
+3. 해당 이미지의 최신버전을 다운받고, 이미지 캐시에 저장한다.
+4. 이미지를 기반으로 컨테이너를 생성하고, 구동 준비 세팅을 한다.
+5. 해당 컨테이너에 도커엔진 내부의 사설망(private network)에 기반한 가상 IP를 부여한다.
+6. 호스트의 80포트를 열고, 컨테이너의 80포트로 연결한다.
+7. 이미지의 도커파일에 있는 커맨드를 사용하여 컨테이너를 시작(구동)한다.
+
+따라서 위에서 사용했던 커맨드는 이렇게 해석할 수 있다.
+
+`docker container run --publish <호스트 리스닝 포트>:<컨테이너 포워딩 포트> nginx:<버젼> <start 시의 커맨드 수정>`
