@@ -6,7 +6,7 @@ const config = {
   ========================================= */
   title: `aalphaca's devlog`,          // Displayed in header
   description: `Always Awake`,     // Site description
-  maxWidth: "1280px",                  // Max width of website
+  maxWidth: "1024px",                  // Max width of website
   enableAbout: true,                  // Enables about page
   siteUrl: `https://blogik.netlify.app/`, // For sitemap & RSS feed
   useScrollIndicator: true,           // Use scroll indicator on top of screen in posts
@@ -47,7 +47,7 @@ const config = {
 
   /* More Custom Settings
   ========================================= */
-  defaultTheme: "dark",                      // Options: dark / light -- applied to first visitors
+  defaultTheme: "light",                      // Options: dark / light -- applied to first visitors
   showTimeToRead: false,                      // Shows time to read for each post in main page
   breakCodeLines: true,                      // Breaks long code lines instead of having horizontal scroll
   faviconSrc: `_assets/icon-camel.png`,        // Favicon
