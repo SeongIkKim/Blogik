@@ -1,0 +1,109 @@
+---
+title: 인공지능을 위한 파이썬 기초
+date: 2021-01-18
+tags: [BoostCamp AI Tech, Python]
+excerpt: Python Basic for AI by 최성철, BoostCamp AI Tech 1주차
+---
+본 정리 내용은 [Naver BoostCamp AI Tech](https://boostcamp.connect.or.kr/)의 edwith에서 수강한 내용을 정리한 것입니다.  
+사실과 다른 부분이 있거나, 수정이 필요한 사항은 댓글로 남겨주세요.
+---
+1주차
+
+# 파이썬 개요
+
+## Python
+
+- 플랫폼 독립적인 인터프리터 언어(Interpreted Language)
+
+|항목|컴파일러 언어|인터프리터 언어|
+|---|:-:|:-:|
+|작동방식| **소스코드를 기계어로 먼저 번역** , 해당 플랫폼에 최적화되어 프로그램 실행 |별도의 번역과정 없이 **소스코드를 실행시점에서 해석**|
+|장점|실행속도가 빠름|간단히 작성, 메모리 필요량 적음|
+|단점|한번에 많은 메모리 필요|실행속도가 느림|
+|주요 언어|`C`, `JAVA`, `C++`, `C#`|`Python`, `Scala`|
+
+- 객체지향 동적 타이핑 언어
+    - **실행순서가 아닌 단위 모듈(객체) 중심으로 프로그램 작성**
+    - method와 attribute를 가지고 있음
+- 동적 타이핑 언어
+    - 프로그램 **실행 시점에** 프로그램이 사용해야 할 **데이터에 대한 타입을 결정**함
+
+# 파이썬/AI 개발환경 준비하기
+
+## 파이썬 인터프리터
+
+- 2.7과 3.X 버전이 존재 : 현재는 3.X 기준으로 모든 시스템이 작동됨 → 2020년부터 `Tensorflow`에서 python 2 deprecated
+- 기존 라이브러리 사용 여부에 따라 버전 선택(아직 아마존에서는 python 2를 사용하는 부서가 있다고..)
+- `Anaconda` : 일반적인 파이썬 인터프리터와 달리 다양한 과학계산용 모듈들을 묶어서 패키지한 인터프리터
+
+## 코드 편집기
+
+- 어플리케이션형
+    - `VSCode`, `Anaconda`, `PyCharm`
+    - 이 중 `Anaconda`는 ML의 사실상 표준
+- 웹 기반 인터랙티브 편집기
+    - `Jupyter`, `CoLab`
+        - 편집기라기보다는 데이터 분석 도구의 느낌이 강함
+
+## Jupyter
+
+- IPython 커널 기반 대화형 python shell
+- 일반적인 터미널 shell + 웹 기반 데이터 분석 Notebook 제공
+- 미디어, 텍스트, 코드, 수식 등의 하나의 문서로 표현 가능
+- 사실상 데이터분석 Interactive Shell의 표준
+- **Ju**lia + **Pyt**hon + **R**
+
+## Colab
+
+- 구글이 개발한 클라우드기반 jupyter notebook
+- Google Drive + GCP + jupyter 등이 합쳐져서 사용자가 손쉽게 접근
+- 초기 모듈들이 세팅되어있다는 장점
+- Google Drive 파일 업로드하여 사용 가능
+- VSC 연결하여 사용 가능
+- V100 이상의 GPU 무료 사용 가능
+
+### 커맨드 정리
+
+- `conda activate [가상환경]` - conda 가상환경 실행(디폴트 설치 가상환경 base)
+- `conda deactivate` - conda 가상환경 종료
+- `jupyter notebook` - jupyter 웹 즉시 실행. 커맨드 실행 폴더가 root dir
+- Jupyter 커맨드
+    - `cmd + return` - 셀 수행(메모리 적재)
+    - `opt + return` - 새로운 셀 생성 후 전환
+    - `shift + tap` - 툴팁
+    - `cmd + <,>` - 들여쓰기, 내어쓰기
+    - 작성 중 `esc` - 코멘트 모드 (작성중은 에디터 모드)
+        - `b` - 아래쪽에 셀 추가
+        - `a` - 위쪽에 셀 추가
+        - `ii` - 실행 중지
+        - `dd` - 셀 삭제
+        - `z` - 셀 지우기 취소
+        - `shift  + m` - 셀 병합
+        - `x` - 셀 오려두기
+        - `v` - 새 셀 생성 후 붙여넣기
+        - `mm` - 마크다운 변환
+        - `yy` - 코드로 변환
+        - `h` - 단축키 확인
+- Colab 커맨드
+    - 미묘하게 Jupyter와 다르니 자료를 보고 학습할 것
+- VSC 커맨드
+    - 드래그 후 `cmd + d` - 드래그한 코드와 같은 코드들을 일괄 지정하여 수정 가능
+    - `opt + click` - 다중 커서 설정
+    - `opt + up/down` - 드래그 X 시 해당 라인만, 드래그 O 시 해당 범위 통째로 코드 이동
+    - `opt + shift + up/down` - 드래그  X 시 해당 라인만, 드래그 O시 해당 범위 통째로 복사하여 코드 이동
+    - `opt + shift + i` - 드래그 한 모든 줄의 끝부분에 다중 커서 생성
+    - `opt + shift + 드래그` - 현재 커서 위치 기준으로 드래그한 모든 라인에 다중 커서 생성
+    - `cmd + return` - 현재 커서 위치와 관계없이 다음 줄로 커서 이동(엔터)
+    - `cmd + u` - 이전 커서 위치로 이동
+    - `cmd + b` - 프로젝트 디렉토리 사이드바 토글
+    - `cmd + p` - 파일 퀵 오픈
+    - `cmd + ,` - 유저 세팅 오픈
+    - `cmd + k + s` - 단축키 확인
+
+---
+
+환경 설정 기록
+
+`miniconda 4.8.2` - brew cask install
+
+`VSC`

@@ -6,7 +6,7 @@ const config = {
   ========================================= */
   title: `aalphaca's devlog`,          // Displayed in header
   description: `Always Awake`,     // Site description
-  maxWidth: "1024px",                  // Max width of website
+  maxWidth: "1280px",                  // Max width of website
   enableAbout: true,                  // Enables about page
   siteUrl: `https://blogik.netlify.app/`, // For sitemap & RSS feed
   useScrollIndicator: true,           // Use scroll indicator on top of screen in posts
@@ -26,7 +26,7 @@ const config = {
   socialMediaLinks: {
     email: { emailAddress: "kpic1638@gmail.com", showHeaderIcon: true },
     github: { accountName: "SeongIkKim", showHeaderIcon: true },
-    facebook: { accountName: "", showHeaderIcon: false },
+    facebook: { accountName: "KimSeongIk", showHeaderIcon: true },
     twitter: { accountName: "", showHeaderIcon: false },
     instagram: { accountName: "seongik_k", showHeaderIcon: true },
     linkedIn: { accountName: "", showHeaderIcon: false },   // Use URL after "linkedin.com/"
@@ -35,13 +35,13 @@ const config = {
 
   /* Social Media Share Buttons--available below every post
   ========================================= */
-  shareButtons: { email: true, facebook: true, twitter: true, reddit: false, linkedIn: false },
+  shareButtons: { email: true, facebook: true, twitter: false, reddit: true, linkedIn: false },
 
   /* Comments
   ========================================= */
   comments: {
     facebook: { enabled: true, appId: "" },      // appId: optional, but used to moderate fb comments
-    disqus: { enabled: false, shortName: "" },   // Check your shortName on https://disqus.com
+    disqus: { enabled: true, shortName: "" },   // Check your shortName on https://disqus.com
     utterances: { enabled: false, repoUrl: "" }, // i.e. 'ellismin/gatsby-blog-mdx'
   },
 
