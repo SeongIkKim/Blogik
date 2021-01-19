@@ -119,6 +119,13 @@ module.exports = {
               linkImagesToOriginal: false,
             },
           },
+
+          {
+            resolve: `gatsby-remark-katex`,
+            options: {
+              strict: `ignore`,
+            }
+          },
         ],
       },
     },
@@ -143,7 +150,7 @@ module.exports = {
     },
 
     {
-      resolve:  'gatsby-plugin-robots-txt',
+      resolve: 'gatsby-plugin-robots-txt',
       options: {
         host: 'https://blogik.netlify.app/',
         sitemap: 'https://blogik.netlify.app/sitemap.xml',

@@ -33,6 +33,7 @@ import {
   U,
 } from "../../MdxComponents"
 
+
 class PostTemplate extends React.Component {
   constructor(props) {
     super(props)
@@ -94,7 +95,7 @@ class PostTemplate extends React.Component {
     // Set as state to unmount script
     this.setState({ script: script })
     document.body.appendChild(script)
-    window.fbAsyncInit = function() {
+    window.fbAsyncInit = function () {
       window.FB.init({
         appId: comments.facebook.appId,
         autoLogAppEvents: true,
@@ -401,10 +402,10 @@ const StyledHTML = styled.div`
           height: 0.75rem;
           margin-right: 0.5rem;
           fill: ${() =>
-            setThemeVars(
-              configStyles.fontColorLight,
-              configStyles.fontColorDark
-            )};
+    setThemeVars(
+      configStyles.fontColorLight,
+      configStyles.fontColorDark
+    )};
         }
       }
       span.ul-children {
