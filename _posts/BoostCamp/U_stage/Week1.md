@@ -247,6 +247,10 @@ print(nan == nan) # False
 
 [Is there a difference between “==” and “is”?](https://stackoverflow.com/questions/132988/is-there-a-difference-between-and-is)
 
+또한, -5~255까지의 정적메모리 판단은 컴파일러의 동작 방식에 따라 다르기때문에, pycharm이나 shell 등에 따라서도 차이가 있는 듯 하다. 
+다음 링크를 참조하자.
+
+[Python3 multiple assignment and memory address](https://stackoverflow.com/questions/35275026/python3-multiple-assignment-and-memory-address/35276097#35276097)
 
 ## 스크립트 파일과 모듈의 시작점
 
@@ -285,7 +289,7 @@ print(decide_lunch) # ['Sandwich', 'Milk]
 ### Dict 활용(Lab-dict)
 
 - Command Analyzer
-    - 서버에 사용자가 명령어를 입력한 기록을 확인할 수 있음
+    - 서버에 사용자가 명령어를 입력한 기록을 확인할 수 있다
     - `{command : id}` 형태
 
 ## Collections
@@ -294,27 +298,32 @@ print(decide_lunch) # ['Sandwich', 'Milk]
 
 - Stack과 Queue를 지원하는 모듈
 - **List에 비해 시간복잡도가 효율적인 자료 저장 방식** - <U>일반적인 pop, append연산도 더 빠르게 수행한다</U>
-- `rotate` , `reverse` 등 `Linked List` 의 특성을 지원함
+- `rotate` , `reverse` 등 `Linked List` 의 특성을 지원한다
 
-`%timeit [측정할 함수()]`  : Jupyter Notebook 내장 속도 측정 
+deque와 list의 속도차이에 대해서는 다음 링크를 참조하자.
+[python: deque vs list performance comparison](https://stackoverflow.com/questions/23487307/python-deque-vs-list-performance-comparison)
+
+<info>
+%timeit [측정할 함수()]  : Jupyter Notebook 내장 속도 측정
+</info>
 
 ### defaultdict
 
-- 하나의 지문에 각 단어가 몇 개나 있는지 세고 싶을 경우
+- 하나의 지문에 각 단어가 몇 개나 있는지 세고 싶을 경우 사용한다
 - Text-mining 접근법 - Vector Space Model
 
 ### Counter
 
-- List를 인자로 받을시
-    - List 내부의 원소 갯수를 세어 dict 형태로 저장
+- List를 인자로 받을 시
+    - List 내부의 원소 갯수를 세어 dict 형태로 저장한다
 - (키, 횟수)쌍의 dict를 인자로 받을 시
-    - `list(Counter.elements())`를 통해 다시 리스트 형태로 변환 가능
+    - `list(Counter.elements())`를 통해 다시 리스트 형태로 변환 가능하다
 - **Set 연산들을 지원함(Set의 확장형)**
 
 ### namedtuple
 
 - Tuple 형태로 **Data 구조체**를 저장하는 방법
-- 저장되는 data의 variable을 사전에 지정해서 저장함
+- 저장되는 data의 variable을 사전에 지정해서 저장한다
 
 ```python
 from collections import namedtuple
@@ -332,14 +341,14 @@ print(Point(x=11, y=22)) # Point(x=11, y=22)
 
 # Pythonic Code
 
-- **파이썬 특유의 문법**을 활용하여 효율적으로 코드 표현
-- 그러나 최근에는 많은 언어들이 서로의 장점을 채용하면서 스타일이 희석됨
+**파이썬 특유의 문법**을 활용하여 효율적으로 코드를 표현하는 방식을 일컫는다.  
+그러나 최근에는 많은 언어들이 서로의 장점을 채용하면서 스타일이 희석되고있다.
 
 ## List Comprehension
 
 - 기존 List를 사용하여 간단히 다른 List를 만드는 기법
-- 파이썬에서 가장 많이 사용되는 기법 중 하나
-- 일반적으로 for + append보다 속도가 빠름
+- 파이썬에서 가장 많이 사용되는 기법 중 하나이다
+- 일반적으로 for + append보다 속도가 빠르다
 
 ```python
 s1 = "abc"
@@ -358,7 +367,7 @@ print(result2)
 
 ## enumerate
 
-- List의 element를 추출할 때  번호를 붙여서 추출
+- List의 element를 추출할 때, 번호를 붙여서 추출한다
 
 ```python
 # 텍스트 정제에서 다음의 테크닉이 자주 사용됨
@@ -369,7 +378,7 @@ print({v : i for i, v in enumerate(text.split())})
 
 ## zip
 
-- <U>두개의 List 값을 병렬적으로 추출함</U>
+- <U>두개의 List 값을 병렬적으로 추출</U>한다
 
 ```python
 alist = ['a1', 'a2', 'a3']
@@ -387,7 +396,7 @@ a3 b3
 ## lambda
 
 - 함수 이름 없이 함수처럼 쓸 수 있는 익명함수
-- 수학의 람다 대수에서 유래함
+- 수학의 람다 대수에서 유래했다
 
 ```python
 f = (lambda x, y : x + y)
@@ -396,18 +405,18 @@ f(10, 50) # 60
 (lambda x, y : x+y)(10, 50) # 60
 ```
 
-- Python 3부터는 공식적으로 권장하지 않지만(PEP 8).. 아직 쓰이는 곳은 많음.
+- Python 3부터는 공식적으로 권장하지 않지만(PEP 8).. 아직 쓰이는 곳은 많다
     - 어려운 문법
     - 테스트의 어려움
     - 문서화 docstring의 지원 미비
-    - 코드 해석의 어려움
+    - 코드 해석의 어려움 - 가독성이 낮다
     - 이름이 존재하지 않는 함수의 출현
 
 ## map
 
-- function을 List의 각 원소에 적용
+- function을 List의 각 원소에 적용한다
 - 두 개 이상의 List에도 사용 가능, if filter도 사용 가능
-- python 3부터는 iteration 반환 → List 형변환 해야 List로 사용가능
+- python 3부터는 iteration 반환 → List 형변환 해야 List로 사용가능하다
     - iteration은 실행 시점의 값을 생성하므로 메모리가 효율적이다
 
 ```python
@@ -418,12 +427,12 @@ print(list(map(f, ex, ex)))
 # 그냥 map함수를 반환할 경우 generator 반환
 ```
 
-- lambda와 마찬가지로 최근에는 map보다 list comprehension을 사용하는 것을 더 권장함
+- lambda와 마찬가지로 최근에는 map보다 list comprehension을 사용하는 것을 더 권장한다
 
 ## reduce
 
 - `map` function과 달리 <U>List에 똑같은 함수를 적용해서 **통합(누적, 축적)**</U>
-- 이전 계산의 결과값을 x로 다시 잡고, 다음 원소를 y로 잡음
+- 이전 계산의 결과값을 x로 다시 잡고, 다음 원소를 y로 잡는다
 
 ```python
 from functools import reduce
@@ -435,8 +444,8 @@ print(reduce(lambda x, y: x+y, [1,2,3,4,5]))
 ## iterable objects
 
 - sequence 자료형에서 데이터를 순서대로 추출하는 object
-- 내부적 구현으로 `__iter__`과 `__next__`가 사용됨
-- `iter()`와 `next()` 함수로 iterable object로 바꾸어 사용
+- 내부적 구현으로 `__iter__`과 `__next__`가 사용된다
+- `iter()`함수로 iterable object로 바꾸고, `next()` 함수로 다음 데이터를 추출한다
 
 ```python
 cities = ['Seoul', 'Paris', 'Tokyo']
@@ -450,8 +459,8 @@ print(next(goto)) # Exception : Stop Iteration
 ## generator
 
 - iterable object를 특수한 형태로 사용해주는 함수
-- **<U>element가 사용되는 시점에 값을 메모리에 반환</U>**
-    - yield를 사용해 한번에 하나의 메모리만 반환
+- **<U>element가 사용되는 시점에 값을 메모리에 반환</U>**한다
+    - `yield`를 사용해 한번에 하나의 메모리만 반환한다
 
 ```python
 def generarator_list(value):
@@ -474,22 +483,21 @@ for a in generator_list(50):
 
 ### keyword argument
 
-- 함수에 입력되는 parameter의 변수명을 사용
-- arguments를 넘김
+- 함수에 입력되는 parameter의 변수명을 지정하여 argument를 넘긴다
 
 ### default argument
 
-- parameter의 기본 값을 사용, 입력하지 않을 경우 기본 값 출력
+- parameter의 기본 값을 설정하며, argument를 입력하지 않을 경우 기본 값을 사용한다
 
 ### variable-length argument
 
-- **개수가 정해지지 않은 변수**를 함수의 parameter로 사용
+- **개수가 정해지지 않은 변수**를 함수의 parameter로 사용한다
     - 다항 방정식, 마트 물건 계산 함수
-    - argument가 몇 개나 들어올 지 모름
-- Asterisk(*) 기호를 사용하여 parameter 표기
-- 입력된 값은 **tuple type**으로 사용가능
-- 가변인자는 **오직 한개**만, **맨 마지막 parameter 위치**에 사용 가능
-- 일반적으로 `*args` 를 변수명으로 사용
+    - argument가 몇 개나 들어올 지 모를 때
+- Asterisk(*) 기호를 사용하여 (가변인자임을) 표기한다
+- 입력된 값은 **tuple type**으로 사용가능하다
+- 가변인자는 **오직 한개**만, **맨 마지막 parameter 위치**에 사용 가능하다
+- 일반적으로 `*args` 를 변수명으로 사용한다
 
 ### parameter 기재 순서
 
