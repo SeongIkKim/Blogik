@@ -102,6 +102,7 @@ excerpt: Python Basic for AI by 최성철, BoostCamp AI Tech 1주차
     - `cmd + ,` - 유저 세팅 오픈
     - `cmd + k + s` - 단축키 확인
 
+---
 
 # 파이썬 기초
 
@@ -214,6 +215,7 @@ print(f'{number:.2f}') # 실수형, 소수점 이하 2자리
 
 ## 조건문
 
+
 ### 비교 연산자 is, is not
 
 일반적으로 자주 사용되는 `==` , `!=` 연산자는 두 var의 **값을 비교**한다.
@@ -245,6 +247,7 @@ print(nan == nan) # False
 
 [Is there a difference between “==” and “is”?](https://stackoverflow.com/questions/132988/is-there-a-difference-between-and-is)
 
+
 ## 스크립트 파일과 모듈의 시작점
 
 ```python
@@ -272,6 +275,274 @@ lunch = ['Sandwich']
 decide_lunch(lunch)
 print(decide_lunch) # ['Sandwich', 'Milk]
 ```
+
+---
+
+# 파이썬 자료 구조(Data Structure)
+
+## Dictionary
+
+### Dict 활용(Lab-dict)
+
+- Command Analyzer
+    - 서버에 사용자가 명령어를 입력한 기록을 확인할 수 있음
+    - `{command : id}` 형태
+
+## Collections
+
+### deque
+
+- Stack과 Queue를 지원하는 모듈
+- **List에 비해 시간복잡도가 효율적인 자료 저장 방식** - <U>일반적인 pop, append연산도 더 빠르게 수행한다</U>
+- `rotate` , `reverse` 등 `Linked List` 의 특성을 지원함
+
+`%timeit [측정할 함수()]`  : Jupyter Notebook 내장 속도 측정 
+
+### defaultdict
+
+- 하나의 지문에 각 단어가 몇 개나 있는지 세고 싶을 경우
+- Text-mining 접근법 - Vector Space Model
+
+### Counter
+
+- List를 인자로 받을시
+    - List 내부의 원소 갯수를 세어 dict 형태로 저장
+- (키, 횟수)쌍의 dict를 인자로 받을 시
+    - `list(Counter.elements())`를 통해 다시 리스트 형태로 변환 가능
+- **Set 연산들을 지원함(Set의 확장형)**
+
+### namedtuple
+
+- Tuple 형태로 **Data 구조체**를 저장하는 방법
+- 저장되는 data의 variable을 사전에 지정해서 저장함
+
+```python
+from collections import namedtuple
+Point = namedtuple('Point', ['x', 'y']) # namedtuple(구조체명, 구조체변수)
+p = Point(11, y=22) # x=11, y=22
+x,y = p
+
+print(p[0] + p[1]) # 33
+print(x,y) # 11 22
+print(p.x + p.y) # 33
+print(Point(x=11, y=22)) # Point(x=11, y=22)
+```
+
+---
+
+# Pythonic Code
+
+- **파이썬 특유의 문법**을 활용하여 효율적으로 코드 표현
+- 그러나 최근에는 많은 언어들이 서로의 장점을 채용하면서 스타일이 희석됨
+
+## List Comprehension
+
+- 기존 List를 사용하여 간단히 다른 List를 만드는 기법
+- 파이썬에서 가장 많이 사용되는 기법 중 하나
+- 일반적으로 for + append보다 속도가 빠름
+
+```python
+s1 = "abc"
+s2 = "123"
+
+# s1과 s2에서 각각 한 원소들을 뽑아서 조합
+result1 = [i+j for i in s1 for j in s2]
+print(result1)
+# ['a1', 'a2', 'a3', 'b1', 'b2', 'b3', 'c1', 'c2', 'c3']
+
+# s2의 한 원소를 기준으로 s1의 각 원소들 조합, 이를 하나의 리스트로 묶음
+result2 = [[i+j for i in s1] for j in s2]
+print(result2)
+# [['a1', 'b1', 'c1'], ['a2', 'b2', 'c2'], ['a3', 'b3', 'c3']]
+```
+
+## enumerate
+
+- List의 element를 추출할 때  번호를 붙여서 추출
+
+```python
+# 텍스트 정제에서 다음의 테크닉이 자주 사용됨
+text = 'Alphaca lives in Seoul'
+print({v : i for i, v in enumerate(text.split())})
+# {'Alphaca': 0, 'lives': 1, 'in': 2, 'Seoul': 3}
+```
+
+## zip
+
+- <U>두개의 List 값을 병렬적으로 추출함</U>
+
+```python
+alist = ['a1', 'a2', 'a3']
+blist = ['b1', 'b2', 'b3']
+for a, b in zip(alist, blist): # 병렬적으로 값을 추출
+	print(a,b)
+'''
+출력값
+a1 b1
+a2 b2
+a3 b3
+'''
+```
+
+## lambda
+
+- 함수 이름 없이 함수처럼 쓸 수 있는 익명함수
+- 수학의 람다 대수에서 유래함
+
+```python
+f = (lambda x, y : x + y)
+f(10, 50) # 60
+
+(lambda x, y : x+y)(10, 50) # 60
+```
+
+- Python 3부터는 공식적으로 권장하지 않지만(PEP 8).. 아직 쓰이는 곳은 많음.
+    - 어려운 문법
+    - 테스트의 어려움
+    - 문서화 docstring의 지원 미비
+    - 코드 해석의 어려움
+    - 이름이 존재하지 않는 함수의 출현
+
+## map
+
+- function을 List의 각 원소에 적용
+- 두 개 이상의 List에도 사용 가능, if filter도 사용 가능
+- python 3부터는 iteration 반환 → List 형변환 해야 List로 사용가능
+    - iteration은 실행 시점의 값을 생성하므로 메모리가 효율적이다
+
+```python
+ex = [1,2,3,4,5]
+f = lambda x, y : x + y
+print(list(map(f, ex, ex)))
+# [2,4,6,8,10]
+# 그냥 map함수를 반환할 경우 generator 반환
+```
+
+- lambda와 마찬가지로 최근에는 map보다 list comprehension을 사용하는 것을 더 권장함
+
+## reduce
+
+- `map` function과 달리 <U>List에 똑같은 함수를 적용해서 **통합(누적, 축적)**</U>
+- 이전 계산의 결과값을 x로 다시 잡고, 다음 원소를 y로 잡음
+
+```python
+from functools import reduce
+print(reduce(lambda x, y: x+y, [1,2,3,4,5]))
+# 15
+# (((1+2)+3)+4)+5 -> 15
+```
+
+## iterable objects
+
+- sequence 자료형에서 데이터를 순서대로 추출하는 object
+- 내부적 구현으로 `__iter__`과 `__next__`가 사용됨
+- `iter()`와 `next()` 함수로 iterable object로 바꾸어 사용
+
+```python
+cities = ['Seoul', 'Paris', 'Tokyo']
+goto = iter(cities)
+print(next(goto)) # 'Seoul'
+print(next(goto)) # 'Paris'
+print(next(goto)) # 'Tokyo'
+print(next(goto)) # Exception : Stop Iteration 
+```
+
+## generator
+
+- iterable object를 특수한 형태로 사용해주는 함수
+- **<U>element가 사용되는 시점에 값을 메모리에 반환</U>**
+    - yield를 사용해 한번에 하나의 메모리만 반환
+
+```python
+def generarator_list(value):
+	result = []
+	for i in range(value):
+		yield i
+
+for a in generator_list(50):
+	print(a) # a 호출시마다 생성하여 전달 -> 메모리 절약
+```
+
+- 다음의 경우에 generator를 사용하자
+    - **List 타입의 데이터를 반환해주는 함수**
+        - 읽기 쉽기도 하고, 중간 과정에서 loop가 중단될 수 있다면 더 효율적이다
+    - **큰 데이터를 처리할 때**
+        - 데이터가 커도 (메모리 적재 효율이 좋아) 처리의 어려움이 없다
+    - **파일 데이터를 처리할 때**
+
+## arguments 전달 방법
+
+### keyword argument
+
+- 함수에 입력되는 parameter의 변수명을 사용
+- arguments를 넘김
+
+### default argument
+
+- parameter의 기본 값을 사용, 입력하지 않을 경우 기본 값 출력
+
+### variable-length argument
+
+- **개수가 정해지지 않은 변수**를 함수의 parameter로 사용
+    - 다항 방정식, 마트 물건 계산 함수
+    - argument가 몇 개나 들어올 지 모름
+- Asterisk(*) 기호를 사용하여 parameter 표기
+- 입력된 값은 **tuple type**으로 사용가능
+- 가변인자는 **오직 한개**만, **맨 마지막 parameter 위치**에 사용 가능
+- 일반적으로 `*args` 를 변수명으로 사용
+
+### parameter 기재 순서
+
+`**def 함수명(p1, p2, *args, **kwargs)**`
+
+### asterisk unpacking
+
+- asterisk(*)는 곱 연산, 제곱 연산, 가변인자에도 쓰이지만, unpacking에도 사용된다.
+- tuple, dict 등 자료형 안에 들어가 있는 값을 unpacking한다.
+- 함수의 입력값, zip 등에 유용하게 사용 가능하다.
+
+```python
+# 사용법 1 - 가변인자에 언패킹해서 arguments 넘기기
+def asterisk_test1(a, *args):
+	print(a, args) # 언패킹된 다수의 arguments들이 하나의 튜플 args로 묶임
+	print(type(args))
+
+asterisk_test1(1, *(2,3,4,5,6))
+# 1 (2,3,4,5,6)
+# <class 'tuple'>
+
+def asterisk_test2(a, args):
+	print(a, *args) # 패킹되어 넘겨진 args가 언패킹되어 다수의 varaible로 출력
+	print(type(args))
+
+asterisk_test2(1, (2,3,4,5,6))
+# 1 2 3 4 5 6
+# <class 'tuple'>
+```
+
+```python
+# zip과 함께 사용하는 경우
+# 각 리스트의 첫 원소와 두 번째 원소만 따로 묶어 각각 리스트로 만들고 싶다면
+
+ex = ([1,2], [3,4], [5,6])
+for value in zip(ex):
+	print(value)
+'''
+출력값
+([1,2], )
+([3,4], )
+([5,6], )
+'''
+
+for value in zip(*ex): # 튜플 언패킹
+	print(value)
+'''
+출력값
+(1,3,5)
+(2,4,6)
+'''
+```
+
 
 ---
 

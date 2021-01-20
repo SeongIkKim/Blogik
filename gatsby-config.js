@@ -38,6 +38,12 @@ module.exports = {
       options: {
         extensions: [`.mdx`, `.md`],
         gatsbyRemarkPlugins: [
+          {
+            resolve: `gatsby-remark-katex`,
+            options: {
+              strict: `ignore`,
+            }
+          },
           // Adding title to code blocks. Usage: ```js:title=example.js
           {
             resolve: "gatsby-remark-code-titles",
