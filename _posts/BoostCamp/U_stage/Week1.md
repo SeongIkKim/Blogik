@@ -551,6 +551,346 @@ for value in zip(*ex): # 튜플 언패킹
 '''
 ```
 
+---
+# Untitled
+
+# Python Object-Oriented Programming(OOP)
+
+객체는 실생활에서의 물건으로 비유될 수 있다.
+
+**속성(attribute)**와 **행동(Action)**를 가진다.
+
+OOP는 이러한 객체 개념을 프로그램으로 표현하고자 하는 프로그래밍 기법이다.
+
+<U>속성은 변수(variable), 행동은 함수(method)</U>로 표현된다.
+
+과거에는 C#, JAVA같은 언어들이 객체 지향 프로그램 언어의 대명사였으나, 현재는 대부분의 언어들이 객체지향 형태를 차용하고 있고, Python도 그 중 하나이다.
+
+## Class
+
+#
+### 선언하기
+
+`class class_name(object)` 형태로 선언하며, 상속받을 객체인 object는 생략해도 선언된다.
+
+일반적인 python 함수/변수명은 snake_case를 사용하지만, class명에는 CamelCase를 사용한다.
+
+#
+### Attribute 추가하기
+
+`__init__` , `self` 와 함께 사용한다. 이 중 `__init__` 은 객체를 초기화하는 예약함수이다.
+
+```python
+class BoostCamper(student):
+	def __init__(self, name, ID, group):
+		self.name = name
+		self.ID = ID
+		self.group = group
+```
+
+<Info>
+
+Python에서 __는 특수한 예약함수나 변수, 그리고 함수명 변경(Mangling)으로 사용된다. Mangling은 소스 코드에 있는 함수명, 변수명 등을 컴파일러가 일종한 규칙을 가지고 변경하는 것을 의미한다.
+
+</Info>
+
+```python
+# 특수한 예약 함수(Magic Method, Dunder Method, Double Underscore Method)
+# ex - __main__, __add__, __str__, __eq__ 등
+
+class BoostCamper(student):
+	def __str__(self):
+		return f"Hello, My name is {self.name}. My group is {self.group}."
+
+SeongIk = BoostCamper(SeongIk, 1024, 34)
+print(SeongIk) # Hello, My name is SeongIk. My group is 34.
+```
+
+파이썬의 name mangling에 관련된 reference는 다음을 참고하자.
+
+[파이썬(python) - 네임 맹글링(name mangling) - 티베트 모래여우 티스토리 블로그](https://tibetsandfox.tistory.com/21)
+
+#
+### Method 구현하기
+
+기존 함수를 선언하는 방식과 비슷하지만, parameter에 반드시 `self`를 추가해야 class method로 인정된다.
+
+```python
+class BoostCamper(student):
+	def sharing_infos(self, args)
+			print(*args)
+```
+#
+### OOP에 필요한 것
+
+1. __Inheritance, 상속__
+    - 부모 클래스로부터 attribute와 method를 물려받은 자식 클래스를 생성하는 것
+    - 자식 클래스에서 `super()` 를 사용해 부모 객체를 사용할 수 있다.
+2. **Polymorphism, 다형성**
+    - 같은 이름 메소드의 **내부 로직을 다르게 작성** - *Overidding*, *Overloading*등의 개념과 연결된다
+    - Dynamic Typing 특성으로 인해, python에서는 같은 부모클래스의 상속에서 주로 발생한다.
+        - 다른 언어들과 달리, <U>Python은 parameter 타입을 강제하지 않기 때문에 굳이 *Overloading*을 구현할 필요가 없다.</U>
+3. **Visibility**
+    - 객체의 정보를 볼 수 있는 레벨을 조절하는 것
+    - **누구나 객체 안에 있는 모든 변수를 볼 수 있다면...**
+        - 객체를 사용하는 사용자가 임의로 정보를 수정할 수 있게 된다
+        - 필요없는 정보에는 접근할 수 있게 된다
+        - 프로덕트로 판매한다면 소스코드가 유출될 수 있다
+    - Encapsulation(캡슐화), Information Hiding(정보 은닉)과 연관된 개념
+        - Class를 설계할 때에 클래스 간 간섭/정보공유는 최소화되어야한다.
+        - 캡슐을 던지듯, 인터페이스만 알아서 사용하도록 만들어야한다.
+    - `self.__attribute` 형태로 Private 변수를 선언할 수 있다.
+    #
+    ```python
+    '''
+    Product 객체를 Inventory에 추가한다
+    Inventory에는 Product 객체만 들어간다
+    Inventory는 Product가 몇 개인지 확인이 필요하다
+    Inventory에 Product Items는 직접 접근이 불가하다
+    '''
+    class Product(object):
+    	pass
+
+    class Inventory(object):
+    	def __init__(self):
+    		self.__items = [] # Private 변수
+    	
+    	'''
+    	만약 items에 Inventory가 접근 가능하게 하려면, 다음 코드를 추가한다.
+    	'''
+    	# @property # property decorator - 숨겨진 변수를 내부에서 접근해 반환시켜준다
+    	# def items(self):
+    		# return self.__items
+    	# 일반적으로는 위와 같이 구현하지 않고, copy를 하여 반환해준다(내부 변수 조작을 막기 위해)
+
+    	def add_new_item(self, product):
+    			# Product 객체만 Inventory에 넣을 수 있음
+    			if type(product) == Product:
+    				self.__items.append(product)
+    				print("new item added")
+    			else:
+    				raise ValueError("Invalid Item")
+
+    	def get_numbers_of_items(self):
+    			return len(self.__items)
+    		
+    ```
+
+#
+## Decorator
+#
+### First-class objects
+#
+**일등함수** 또는 **일급객체**라고 부른다.
+
+**변수나 데이터 구조에 할당이 가능한 객체**를 일컫는다.
+
+parameter로 전달 가능하며, 반환 값으로도 사용할 수 있다.
+
+**Python의 함수는 일급함수이다.** 즉, <U>파라미터로 사용</U>하거나, <U>리턴값으로 사용할 수 있다</U>
+
+```python
+def square(x):
+	return x*x
+
+def cube(x) :
+	return x*x*x
+
+# 함수 method 자체를 파라미터로 사용
+def formula(method, argument_list):
+	return [method(value) for value in arguement_list]
+```
+#
+### Inner function
+
+함수 내에 또 다른 함수가 존재하는 형태이다.
+
+```python
+def print_msg(msg):
+	def printer():
+		print(msg)
+	printer()
+
+print_msg("Hello, Python")
+```
+
+이런 형태 중, inner function을 return값으로 반환시켜주는 경우를 **closure,클로져**라고 한다.
+
+```python
+def print_msg(msg):
+	def printer():
+		print(msg)
+	return printer
+
+another = print_msg("Hello, Python") # inner function printer를 another에 할당한다.
+another() # Hello, Python
+```
+
+위의 코드에서, 마지막 줄의 `another()` 은 따로 `"Hello, python"` 이라는 string을 argument로 넘겨받지 않았는데도 Hello, Python을 출력한다. 이는 함수가 선언된 시점에 주변 환경 값을 저장하는 특성이 있기 때문인데, 이때문에 내부 함수가 전달받지 않은 외부 함수의 변수를 사용할 수 있게 된다.
+
+이에 대한 자세한 내용은 다음 링크를 참조하자.
+
+[파이썬 - 클로져 (School of Web, 이상희)](http://schoolofweb.net/blog/posts/%ED%8C%8C%EC%9D%B4%EC%8D%AC-%ED%81%B4%EB%A1%9C%EC%A0%80-closure/#:~:text=%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%20%EC%96%B8%EC%96%B4%EC%97%90%EC%84%9C%EC%9D%98%20%ED%81%B4%EB%A1%9C%EC%A0%80,%ED%95%A8%EA%BB%98%20%EC%A0%80%EC%9E%A5%ED%95%9C%20%EB%A0%88%EC%BD%94%EB%93%9C%EC%9D%B4%EB%8B%A4.)
+
+#
+
+ **<U>클로져를 사용하는 이유는, 비슷한 목적을 가진 다양한 함수를 만들어내기 위함이다</U>**. 하나의 외부 함수 내부에 여러 내부 함수를 만들어, arg에 따라 다른 내부 함수를 호출하고자 할때 사용할 수 있다.
+
+이처럼 **복잡한 클로져 함수를 간단하게 만드는 방법**으로 decorator를 사용할 수도 있다.
+#
+```python
+def star(func):
+	def inner(*args, **kwargs):
+		print(args[0] * 30)
+		func(*args, **kwargs) # 파라미터로 받은 printer 함수를 호출
+		print(args[0] * 30)
+	return inner
+
+@star
+def printer(msg):
+	print(msg)
+
+printer("Hello","*") # * 대신 &을 넣을경우, &&&&...으로 바뀜
+
+'''
+출력값
+******************************
+Hello
+******************************
+'''
+```
+#
+이 때, decorator 자체에도 parameter 값을 넣을 수 있다.
+#
+```python
+def generate_power(exponent):
+	def wrapper(f):
+		def inner(*args): # *args는 raise_two의 모든 파라미터들을 가져옴
+			result = f(*args)
+			return exponent**result
+		return inner
+	return wrapper
+
+@generate_power(2) # 데코레이터의 arg 2는 exponent 파라미터에 전달
+def raise_two(n): # raise_two 함수는 wrapper 함수의 파라미터 f에 전달
+	return n**2
+
+print(raise_two(7)) # 562949953421312 --> 먼저 ex
+```
+
+관계가 꽤 복잡하다. 잘 이해가 안된다면 다음 링크를 참고해보자.
+
+[[코드잇] 파이썬 데코레이터(Decorator)에 파라미터 넣기](https://www.theteams.kr/teams/8573/post/73270)
+#
+#
+OOP와 관련된 글로, 다음을 참고하자. 다소 제목이 자극적이지만, OOP의 위험한 점을 토대로 **'OOP가 언제나 옳은가? 정말 좋은 OOP란 무엇인가'**에 대해 고민해볼 수 있는 글이다.
+
+[[번역] OOP를 빨리 잊을 수록 여러분과 여러분의 소프트웨어에 좋습니다 - rinae's devlog](https://rinae.dev/posts/the-faster-you-unlearn-oop-the-better-for-you-and-your-software-kr#%EA%B0%99%EC%9D%80-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%A5%BC-%EB%B0%94%EB%9D%BC%EB%B3%B4%EB%8A%94-%EC%97%AC%EB%9F%AC-%EA%B0%80%EC%A7%80-%EB%B0%A9%EB%B2%95%EC%9D%B4-%EC%9E%88%EB%8B%A4)
+
+#
+## Module과 Project
+#
+### Module
+#
+작은 프로그램의 조각들로, 모듈들을 모아서 하나의 큰 프로그램을 개발한다.
+
+프로그램을 모듈화시키면 다른 프로그램에서도 가져다 사용하기 쉬워진다.
+
+- 예를 들어, 카카오 게임을 실행하기 위해 로그인하는 과정에서 카카오톡 로그인 모듈을 가져다 쓸 수 있다.
+- Python에서 Module은 `.py` 파일을 의미한다.
+
+#
+### namespace
+
+특정 모듈을 import하면, 모듈 내의 모든 코드가 메모리에 로딩된다.
+
+이 경우 필요하지 않은 변수도 읽어 올 수 있고, print문 등의 불필요한 코드들을 불러오게 될 수 있다.
+
+이러한 불편함을 막기 위하여 namespace를 사용한다.
+
+- 모듈을 호출할 때 범위를 정하는 방법이다
+- 모듈 안에는 함수와 클래스 등이 존재한다. 이 중 필요한 내용만 골라서 호출할 수 있다.
+- `from`과 `import` 키워드를 사용한다.
+#
+```python
+# Alias 설정 - 모듈명을 별칭으로 사용하기
+# 어느 모듈에서 왔는지 볼 수 있으므로 가독성 측면에서 가장 좋은 방식
+import module as mo
+print(mo.func(1))
+
+# 모듈 내에서 특정 함수 또는 클래스만 호출하기
+from module import func
+print(func(1))
+
+# 모듈에서 모든 함수 또는 클래스를 호출하기
+from module import *
+print(foo(1))
+print(bar(1))
+```
+#
+### Package
+
+모듈을 모아놓은 단위로, 하나의 대형 프로젝트를 만드는 모듈들의 합(폴더)이다.
+
+`__init__`, `__main__` 등의 키워드 파일명이 사용되며, 다양한 오픈소스들이 모두 패키지로 관리되고 있다.
+
+- `__init__.py`
+    - 현재 폴더가 패키지임을 알리는 초기화 스크립트이다
+    - 없을 경우 패키지로 간주하지 않았으나, Python 3.3부터는 없어도 Package로 인식한다
+    - 하위 폴더와 모듈들을 모두 포함한다
+    - `import` 와 `__all__` 키워드를 사용할 수 있다.
+        - `__all__` 변수 내부에 어떤 모듈들을 패키지로 인식할 것인지 문자열 리스트로 지정한다.
+        - import를 이용하여 해당 모듈들을 `__init__.py` 안에서 로딩 해둬야 한다.
+
+### Package namespace
+
+패키지 내에서 다른 폴더의 모듈을 부를 때, 상대 참조로 호출할 수도 있다.
+
+```python
+# 절대참조
+from game.graphic.render import render_test()
+
+# 현재 디렉토리 기준 상대참조
+from .render import render_test()
+
+# 부모 디렉토리 기준 상대참조
+from ..sound.echo import echo_test()
+```
+#
+## 가상환경 Virtual Environment
+
+프로젝트 진행 시 **필요한 패키지만 설치할 수 있는 가상환경**을 따로 구축할 수 있다.
+
+가상환경 내부에 **기본 인터프리터**와 **프로젝트 종류별 패키지**를 설치한다.
+
+- ex) 웹프로젝트, 데이터 분석 프로젝트
+
+다양한 패키지 관리 도구를 사용한다. 대표적인 도구로 `virtualenv` 와 `conda` 가 있다.
+
+|패키지 관리 도구|`virtualenv`+`pip`|`conda`|
+|:---|:---:|---:|
+|설명|가장 **대표적인** 가상환경 관리 도구|**상용** 가상환경도구, miniconda 기본 도구|
+|장점|레퍼런스와 패키지 개수가 압도적임|설치가 용이하고, Windows에서 잘 동작함|
+
+<Info>
+
+Python은 C로 동작하는데, 이 때문에 패키지 의존 파일 중 python 코드가 아닌 다른 언어의 코드들이 들어가있는 경우가 간혹 있다. Python 패키지 관리 도구인 pip은 이런 다른 언어 코드들의 C 컴파일 코드를 자동으로 설치하지 않는 경우가 있다. 이에 반해 conda는 의존성 C 컴파일 코드를 모두 같이 설치하므로 동작 중 에러가 비교적 적어 선호된다.
+
+</Info>
+
+**<`conda` 커맨드>**
+
+- `conda create -n [가상환경이름] python=[version]` : 가상환경 생성
+- `conda activate [가상환경 이름]` : 가상환경 실행
+- `conda deactivate` : 가상환경 종료
+- `conda install [패키지명]` : 패키지 설치
+
+<유용한 패키지>
+
+- `tqdm`
+    - 즉석에서 progress bar를 생성해주고, 함수나 반복문의 TTC(Time To Completion)을 예측해준다.
+    - 대량의 데이터를 다루는 코드들은 오래걸리는 경우가 많기 때문에, 이런 소요시간 예측 패키지가 있으면 큰 도움이 된다.
+
 
 ---
 
