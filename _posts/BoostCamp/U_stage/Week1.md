@@ -552,7 +552,6 @@ for value in zip(*ex): # 튜플 언패킹
 ```
 
 ---
-# Untitled
 
 # Python Object-Oriented Programming(OOP)
 
