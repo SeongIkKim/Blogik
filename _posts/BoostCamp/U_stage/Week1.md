@@ -878,6 +878,9 @@ Python은 C로 동작하는데, 이 때문에 패키지 의존 파일 중 python
 
 </Info>
 
+[그래서, `virtualenv`와 `conda` 중 무엇을 사용해야 할까?(Which Python Package Manager Should You Use? - GCP)](https://www.youtube.com/watch?v=3J02sec99RM&feature=youtu.be&ab_channel=GoogleCloudPlatform)  
+~~답은, `pyenv`다~~
+
 **<`conda` 커맨드>**
 
 - `conda create -n [가상환경이름] python=[version]` : 가상환경 생성
