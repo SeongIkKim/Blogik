@@ -18,7 +18,7 @@ excerpt: Python Basic for AI by 최성철, BoostCamp AI Tech 1주차
 - 플랫폼 독립적인 인터프리터 언어(Interpreted Language)
 
 |항목|컴파일러 언어|인터프리터 언어|
-|---|:-:|:-:|
+|---|-----------|--------------|
 |작동방식| **소스코드를 기계어로 먼저 번역** , 해당 플랫폼에 최적화되어 프로그램 실행 |별도의 번역과정 없이 **소스코드를 실행시점에서 해석**|
 |장점|실행속도가 빠름|간단히 작성, 메모리 필요량 적음|
 |단점|한번에 많은 메모리 필요|실행속도가 느림|
@@ -868,19 +868,19 @@ from ..sound.echo import echo_test()
 다양한 패키지 관리 도구를 사용한다. 대표적인 도구로 `virtualenv` 와 `conda` 가 있다.
 
 |패키지 관리 도구|`virtualenv`+`pip`|`conda`|
-|:---|:---:|---:|
+|---|---|---|
 |설명|가장 **대표적인** 가상환경 관리 도구|**상용** 가상환경도구, miniconda 기본 도구|
 |장점|레퍼런스와 패키지 개수가 압도적임|설치가 용이하고, Windows에서 잘 동작함|
 
 <Info>
 
-Python은 C로 동작하는데, 이 때문에 패키지 의존 파일 중 python 코드가 아닌 다른 언어의 코드들이 들어가있는 경우가 간혹 있다. Python 패키지 관리 도구인 pip은 이런 다른 언어 코드들의 C 컴파일 코드를 자동으로 설치하지 않는 경우가 있다. 이에 반해 conda는 의존성 C 컴파일 코드를 모두 같이 설치하므로 동작 중 에러가 비교적 적어 선호된다.
+Python은 C로 동작하는데, 이 때문에 패키지 의존 파일 중 python 코드가 아닌 다른 언어의 코드들이 들어가있는 경우가 간혹 있다. Python 패키지 관리 도구인 pip은 이런 다른 언어 코드들의 C 컴파일 코드를 설치하지 않곤 한다. 이에 반해 conda는 의존성 C 컴파일 코드를 모두 같이 설치하므로 동작 중 에러가 비교적 적어 선호된다.
 
 </Info>
 
 [그래서, `virtualenv`와 `conda` 중 무엇을 사용해야 할까?(Which Python Package Manager Should You Use? - GCP)](https://www.youtube.com/watch?v=3J02sec99RM&feature=youtu.be&ab_channel=GoogleCloudPlatform)  
 ~~답은, `pyenv`다~~
-
+#
 **<`conda` 커맨드>**
 
 - `conda create -n [가상환경이름] python=[version]` : 가상환경 생성
