@@ -762,23 +762,27 @@ Hello
 이 때, decorator 자체에도 parameter 값을 넣을 수 있다.
 #
 ```python
-def generate_power(exponent):
+def generate_power(exponent): 
 	def wrapper(f):
-		def inner(*args): # *args는 raise_two의 모든 파라미터들을 가져옴
+		def inner(*args): # *args는 원래 함수 f(raise_two)의 파라미터들을 받는다. 다른 예제에서의 wrapper역할을 하고 있다.
 			result = f(*args)
 			return exponent**result
 		return inner
 	return wrapper
 
 @generate_power(2) # 데코레이터의 arg 2는 exponent 파라미터에 전달
-def raise_two(n): # raise_two 함수는 wrapper 함수의 파라미터 f에 전달
+def raise_two(n): # raise_two 함수는 wrapper 함수의 파라미터 f에 전달, argument n은 inner 함수에 arg로 전달
 	return n**2
 
 print(raise_two(7)) # 562949953421312 --> 먼저 ex
 ```
 
-관계가 꽤 복잡하다. 잘 이해가 안된다면 다음 링크를 참고해보자.
+관계가 꽤 복잡하다.
+**<U>데코레이터는 기존의 함수(위에서는 `generate_power`)를 수정하지 않으면서, 추가 기능(`raise_two`)을 구현할 때 사용</U>한다.**
+잘 이해가 안된다면 다음 링크를 참고해보자.
 
+[파이썬 데코레이터 - 스쿨오브웹, 이상화](http://schoolofweb.net/blog/posts/%ED%8C%8C%EC%9D%B4%EC%8D%AC-%EB%8D%B0%EC%BD%94%EB%A0%88%EC%9D%B4%ED%84%B0-decorator/)
+[파이썬 코딩도장 - 데코레이터 만들기](https://dojang.io/mod/page/view.php?id=2427)
 [[코드잇] 파이썬 데코레이터(Decorator)에 파라미터 넣기](https://www.theteams.kr/teams/8573/post/73270)
 #
 #
