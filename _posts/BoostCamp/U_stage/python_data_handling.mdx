@@ -1,0 +1,492 @@
+---
+title: 인공지능을 위한 파이썬 - 데이터 다루기
+date: 2021-01-22
+tags: [BoostCamp AI Tech, Python, log, regex, XML, csv, JSON]
+excerpt: Python Basic for AI by 최성철, BoostCamp AI Tech 1주차
+---
+본 정리 내용은 [Naver BoostCamp AI Tech](https://boostcamp.connect.or.kr/)의 edwith에서 수강한 내용을 정리한 것입니다.  
+사실과 다른 부분이 있거나, 수정이 필요한 사항은 댓글로 남겨주세요.
+
+---
+
+# Python으로 데이터 다루기
+
+## Exception Handling
+
+#
+
+### Exception이란?
+
+#
+
+1. 예상 **가능**한 예외
+    - 발생 여부를 **사전에 인지할 수 있는 예외**이다.
+    - 사용자가 잘못된 입력을 하거나, 파일을 호출하였는데 파일이 없을 경우
+    - **개발자가 반드시 명시적으로 정의해야한다.**
+    - 일반적으로 `if` 를 이용하여 처리
+2. 예상 **불가능**한 예외
+    1. **인터프리터 과정에서 발생하는 예외**로, 개발자의 실수라고 볼 수 있다.
+    2. 리스트의 범위를 넘어가는 값을 호출(out of range), 정수 0으로 나눔(division by zero)
+    3. 수행 불가시 인터프리터가 자동 호출한다.
+
+두 가지 경우의 예외에 관하여 Exception Handling을 처리해주어야한다.
+
+#
+
+### Python의 Built-in Exception
+
+<자주 나오는 Exception>
+
+|Exception 이름|내용|
+|-------|------|
+|IndexError|List의 Index 범위를 넘어갈 때|
+|NameError|존재하지 않은 변수를 호출 할 때|
+|ZeroDivisionError|0으로 숫자를 나눌 때|
+|ValueError|변환할 수 없는 문자/숫자를 변환할 때|
+|FileNotFoundError|존재하지 않는 파일을 호출할 때|
+
+# 
+
+### Python의 예외처리
+
+#
+
+- `try` ~ `except` 문법
+- `if`로 처리할 수 있는 경우도 있지만, `try` ~ `except` 를 권장하는 상황이 있다.
+
+    Python에서는 `if` 는 로직의 형태를 처리할 때, `try` ~ `except` 는 사용자의 잘못된 사용으로 인한 예외상황을 처리할 때 사용하는 것을 권장한다.
+
+    ```python
+    try:
+    	예외 발생 가능 코드
+    except <Exception Type>:
+    	예외 발생시 동작하는 코드
+    ```
+
+#
+
+- `try` ~ `except` ~ `else`
+- 잡은 예외가 없을 경우 `else`문을 수행한다.
+
+    ```python
+    try:
+    	예외 발생 가능 코드
+    except <Exception Type>:
+    	예외 발생시 동작하는 코드
+    else:
+    	예외가 발생하지 않을 때 동작하는 코드
+    ```
+
+#
+
+- `try` ~ `except` ~ `finally`
+- 예외를 잡았는지와 관계 없이 `finally` 구문을 수행한다.
+
+    ```python
+    try:
+    	예외 발생 가능 코드
+    except <Exception Type>:
+    	예외 발생시 동작하는 코드
+    finally:
+    	예외 발생 여부와 상관없이 실행됨
+    ```
+
+#
+
+- `raise` => `raise <Exception Type>(예외정보)`
+- 특정 예외를 고의적으로 발생시킨다.
+
+    ```python
+    while True:
+    	value = input("변환할 정수 값을 입력해주세요")
+    	for digit in value:
+    		if digit not in "0123456789":
+    			raise ValueError("숫자값을 입력하지 않으셨습니다")
+    	print("정수값으로 변환된 숫자 -", int(value))	
+    ```
+
+#
+
+- `assert 예외조건`
+- 특정 조건에 만족하지 않을 경우 예외를 발생시킨다.
+- 최근에는 type hinting 때문에 사용빈도가 조금 줄어들었다.
+
+    ```python
+    def get_binary_number(decimal_number):
+    	assert isinstance(decimal_number, int)
+    	return bin(decimal_number)
+
+    print(get_binary_number(10))
+    ```
+
+#
+
+## File Handling
+
+### 파일의 종류
+
+기본적인 파일 종류는 text 파일과 binary 파일로 나뉘어있다.
+
+컴퓨터는 text파일을 처리하기 위해 binary 파일로 변환시킨다. Python에서 우리가 만든 `.py` 파일들은 텍스트파일이므로, `Cpython`을 이용하여 binary 파일인 `.pyc` 파일로 변환된다.
+
+사실, 모든 text 파일도 실제로는 binary 파일이지만, ASCII/Unicode 문자열 집합으로 저장되어서 사람들이 읽을 수 있도록 변환되어 보여질 뿐이다.
+
+|Binary 파일|Text 파일|
+|:-----------|:---------|
+|**이진법** 형태로 저장된 파일|**문자열** 형태로 저장된 파일|
+|일반적으로 메모장을 열면 내용이 깨져 보임|메모장으로 열어 내용 확인 가능|
+|**Excel 파일, 워드파일** 등 어플리케이션 종속 파일|메모장에 저장된 파일, `HTML` 파일, `.py` 파일 등|
+
+### File Write
+
+- mode
+    - `w` : (덮어)쓰기모드
+    - `a` : 추가 모드
+- 한글 등을 넣으려면 `encoding` 옵션을 넣어야 함(utf-8)
+
+```python
+with open("count_log.txt", "a", encoding="utf8") as f:
+	for i in range(1, 11):
+		data = f"{i}번째 줄입니다.<br>"
+		f.write(data)
+```
+
+### Directory 다루기
+
+`os` 모듈을 이용하여 Directory를 다룰 수 있다.
+
+#
+
+```python
+import os
+os.mkdir("log") #해당 디렉토리에 "log" 디렉토리를 생성한다
+
+# Exception Handling과도 함께 사용할 수 있다
+try:
+	os.mkdir("abc")
+except FileExistsError as e:
+	print("Already created")
+
+os.path.exists("abc") # abc라는 폴더가 있는지 확인하고 Boolean값 반환
+
+# 파일을 옮길때
+import shutil
+source = "I_have_a_dream.txt"
+dest = os.path.join("abc", "log.txt") # 디렉토리와 파일의 경로를 합쳐 문자열로 저장
+shutil.copy(source, dest) # abc/log.txt
+
+# 최근에는 path를 객체로 다루는 pathlib 모듈을 더 많이 사용하는 편.
+import pathlib
+
+cwd = pathlib.Path.cwd() # current working directory, 현재 디렉토리
+list(cwd.parent) # 현재 디렉토리의 부모 디렉토리 내용물 리스트화
+```
+
+#
+
+### Pickle
+
+Python의 객체는 생성 시 메모리에 올라갔다가, 인터프리터가 종료되면 메모리에서 내려오게(사라지게)된다.
+
+`Pickle`은 이처럼 **<U>일시적인 Python의 객체를 영속화(persistence)하는 built-in 객체</U>**로, Python에 특화된 binary 파일이다.
+
+데이터, object 등 실행 중 정보를 저장하고, 인터프리터가 종료된 이후에도 정보를 불러와서 사용할 수 있다.
+
+저장해야하는 정보, 계산 결과(모델) 등 활용 방법이 다양하다.
+
+#
+
+```python
+import pickle
+
+f = open("list.pickle", "wb")
+test = [1,2,3,4,5]
+pickle.dump(test, f)
+f.close()
+
+del test # 메모리에서 리스트 삭제
+# print(test) # 에러 출력
+
+f = open("list.pickle", "rb)
+test_pickle = pickle.load(f) # 삭제했던 리스트 binary 로드 가능
+print(test_pickle)
+f.close()
+```
+
+#
+
+## Log Handling
+
+### Logging, 로그 남기기
+
+프로그램이 실행되는 동안 일어나는 정보를 기록으로 남기는 것을 *logging*이라고 한다.
+
+- Log로 남길 것들
+    - 유저 접근 기록, 프로그램의 Exception,  특정 함수 사용 기록 등
+
+- Log를 저장할 위치
+    - Console 화면, 파일, DB 등
+
+이 때, Log는 실행 시점에서 남겨야 하는 기록과 개발시점에서 남겨야 하는 기록 등 상황에 따라 다르게 저장된다.
+
+### print와 logging의 차이
+
+기록을 `print`로 남기는 것도 가능하지만, **console 창에만 남는 기록은 분석을 위해 사용할 수 없다**.
+
+또한, 때로는 level별(develop, production)로 기록을 남길 필요도 있으며, 모듈 별로 별도의 logging을 남길 필요도 있다.
+
+이처럼 **다양한 상황의 기록을 체계적으로 지원하는 모듈**이 필요하기때문에 `logging` 모듈이 사용된다.
+
+### logging 모듈
+
+Python의 기본 Log관리 모듈이다.
+
+DEBUG > INFO > WARNING > ERROR > CRITICAL 수준으로 로그 레벨이 달라진다.
+
+```python
+import logging
+
+logging.debug("디버그 정보")
+logging.info("정보 제공")
+logging.warning("Exception 수준의 경고, 주의")
+logging.error("Exception 수준의 에러 보고")
+logging.critical("프로그램 종료 수준의 에러 보고")
+```
+
+
+|Level|개요|예시|
+|-----|----|----|
+|**debug**|개발시 처리 기록을 남겨야 하는 로그 정보를 남김|다음 함수로 A를 호출함, 변수 A를 무엇으로 변경함|
+|**warning**|- 사용자가 잘못 입력한 정보<br />- 혹은 처리는 가능하나 개발과정에서 의도치 않았던 정보가 들어왔을 때|- Str 입력을 기대했으나, Int 입력→<br />Str casting으로 처리<br />- 함수에 argument로 이차원 리스트를 기대했으나, 일차원 리스트가 들어옴<br />→이차원으로 변환 후 처리|
+|**info**|처리가 진행되는 동안의 정보를 알림|- 서버가 시작되었음<br />- 서버가 종료됨 <br />- 사용자 A가 프로그램에 접속함|
+|**error**|잘못된 처리로 인해 에러가 났으나, 프로그램은 동작할 수 있음을 알림|- 파일에 기록을 해야 하는데 파일이 없음  → Exception 처리 후 사용자에게 알림<br />- 외부서비스와 연결불가|
+|**critical**| 잘못된 처리로 데이터 손실이나 더이상 프로그램이 동작할 수 없음을 알림|- 잘못된 접근으로 해당 파일이 삭제됨<br />- 사용자에 의한 강제 종료|
+
+### Logging 설정법
+
+1. `configparser` : 파일에 설정하는 방식
+    - 프로그램 실행 설정을 file에 저장한다.
+    - Section, Key, Value 값의 형태로 설정된 설정 파일을 사용한다.
+    - 설정파일을 Dict Type으로 호출 후 사용할 수 있다.
+
+    ```python
+    # config file(.cfg)
+
+    [SectionOne] # section은 대괄호
+    Name : Alphaca # 속성은 Key, Value
+    Age : 25 
+    Address : Seoul
+
+    [SectionTwo]
+    FavoriteSinger = Beenzino
+
+    [SectionThree]
+    FavoriteSong = AlwaysAwake
+    ```
+
+    ```python
+    # configparser file
+
+    import configparser
+    config = configparser.ConfigParser()
+    config.sections()
+
+    config.read('example.cfg')
+    config.sections() # ['SectionOne', 'SectionTwo', 'SectionThree']
+
+    for key in config['SectionTwo']:
+    	print(key) # FavoriteSinger
+
+    config['SectionOne']['Age']
+    ```
+
+2. `argparser` : Console창에서 프로그램 실행시 Setting 정보를 저장하는 방식
+    - 거의 모든 Console 기반 Python 프로그램이 기본으로 제공하고있다.
+    - 특수 모듈도 많이 존재하지만(TF), 일반적으로 `argparser`를 많이 사용한다.
+    - Command-Line Option이라고도 부른다
+        - 터미널에서 붙이는 `-h` , `--help` 같은 옵션들도 `argparser`의 예시
+
+    ```python
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Sum two integers.')
+
+    # 인자는 앞에서부터 차례대로 <짧은이름>, <긴 이름>, <표시명>, <Help 설명>, <arg 타입>
+    parser.add_argument('-a', '--a_value', dest='A_value', help='A integers', type=int)
+
+    args = parser.parse_args()
+    print(args) # Namespace(a=입력값)
+    print(args.a) # 입력값
+    ```
+
+## Python Data Handling
+
+### CSV, Comma Separate Values
+
+필드를 쉼표(,)로 구분한 텍스트 파일로, 
+
+**<U>액셀 양식의 데이터를 프로그램에 상관없이 쓰기 위한 데이터 형식이기 때문에 널리 사용</U>**된다.
+
+쉼표 대신 탭(TSV), 빈칸(SSV) 등으로 구분해서 만들어지는 variation이 있고, 이 모든것을 통칭하여 `**character-separated values(CSV)**`라고 부른다.
+
+일반적인 Text File handling처럼, 파일을 불러와 문자열을 읽어와서 처리할수도 있겠지만, 이 경우 **문장 내의 쉼표(,)에 대해 전처리 과정**이 필요하다.
+
+이런 문제를 간단히 csv 파일을 처리하기 위해 python에서 **csv 모듈을 제공**한다.
+
+```python
+import csv
+reader = csv.reader(f, delimeter=',',	quotechar='"', quoting=csv.QUOTE_ALL)
+```
+
+|Attribute|Default|Meaning|
+|:------|:------|:------|
+|**delimiter**|`,`|글자를나누는 기준|
+|**lineterminator**|`\r\n`|줄바꿈 기준|
+|**quotechar**|`"`|문자열을 둘러싸는 신호문자|
+|**quoting**|`QUOTE_MINIMAL`|데이터 나누는 기준이 quotechar에 의해 둘러싸인 레벨|
+
+CSV 모듈의 자세한 사용법에 대해서는 **[Docs](https://docs.python.org/3/library/csv.html)**를 참고한다. 사실 기본적인 기능 읽기, 분리 기능 외에는 크게 사용할 일이 없긴 하다.
+
+진행하면서 `utf-8` 과 `unicode` 의 개념이 헷갈린다면 다음 포스트를 참고하자.
+
+**[Unicode와 UTF-8 간단히 이해하기](https://jeongdowon.medium.com/unicode%EC%99%80-utf-8-%EA%B0%84%EB%8B%A8%ED%9E%88-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0-b6aa3f7edf96)**
+
+#
+
+### Web
+
+`WWW` == `World Wide Web` == `Web`, 줄여서 웹이라고 부른다.
+
+팀 버너스리에 의해 1989년 처음 제안되었으며, 원래는 물리학자들간의 정보 교환을 위한 게시판으로 사용되었다.
+
+데이터 송수신을 위한 `HTTP` 프로토콜을 사용하며, 데이터를 표시하기 위해 `HTML` 형식을 사용한다.
+
+#
+
+### Regular Expression, 정규식
+
+정규표현식을 의미하며, `regexp` 또는 `regex` 등으로 자주 불린다.
+
+**복잡한 문자열 패턴**을 정의하는 **문자 표현 공식**으로, <U>**특정한 규칙**을 가진 **문자열들의 집합을 추출**</U>할 수 있다.
+
+주민등록번호, 전화번호, 도서 ISBN 등 형식이 있는 문자열을 원본 문자열로부터 추출한다.
+
+HTML 역시 tag를 사용한 일정한 형식이 존재하므로, 정규식으로 추출하기에 좋다.
+
+<Info>
+
+단, 문법 자체가 매우 방대하므로 필요할때마다 스스로 찾아서 공부하는것이 좋다.
+
+</Info>
+
+정규식을 테스트해보기 좋은 사이트로 [regexer.com](https://regexr.com/)이 있다.
+
+**<기본 문법>**
+
+- 문자 클래스 `[ ]` : `[` 과 `]` 사이의 문자들과 매치
+    - `[abc]` : 해당 글자가 a,b,c 중 하나이다.
+        - a, before, deep, dud, sunset
+- `-` : 범위 지정
+    - `[a-zA-Z]` - 알파벳 전체
+- 메타 문자
+    - 정규식 표현을 위해 원래 의미가 아닌 **다른 용도로 사용되는 문자들**
+    - `.` : 줄바꿈 문자인 `<br>` 을 제외한 모든 문자와 매치
+    - `*` : 앞에 있는 글자가 **0개 이상**이면 매치
+        - `tomor*ow` - tomoow, tomorrow, , tomorrrrow
+    - `+` : 앞에 있는 글자가 **1개 이상**이면 매치
+        - `tomor+ow` - tomorow, tomorrrow
+    - `{m,n}` - 반복횟수를 지정, m회 이상 n회 이하 (n 생략시 m회 한정)
+    - `?` : 앞의 글자 반복 횟수가 1회
+    - `|` : or
+    - `^` : not
+
+Python에서는 `re` 모듈을 이용하여 regex를 사용할 수 있다.
+
+```python
+# 특정 URL에서 원하는 문자열 파싱해오기
+import re
+import urllib.request
+
+url = "https://url-path.com"
+html = urllib.request.urlopen(url)
+html_contents = str(html.read())
+id_results = re.findall(r"([A-Za-z0-9]+\*\*\*)", html_contents)
+
+for result in id_results:
+	print(results)
+```
+
+#
+
+### XML
+
+`eXtensible Markup Language`의 준말로, **데이터의 구조와 의미를 설명하는 Tag(MarkUp)를 사용**하여 표시하는 언어이다.
+
+**Tag와 Tag 사이에 값이 표시**되고, **구조적인 정보를 표현**할 수 있다.
+
+스키마, DTD 등의 메타정보가 표현되며, 용도에 따라 다양한 형태로 변경이 가능하다.
+
+특히, XML은 **컴퓨터 간(ex: PC - 스마트폰) 정보를 주고받기 매우 유용한 저장방식**으로 쓰이고 있다.
+
+HTML과 문법 형태가 비슷하기 때문에 정규표현식으로 parsing이 가능하나, `BeautifulSoup` 와 같은 좀 더 손쉬운 parser들이 많이 개발되어있다.
+
+- `BeautifulSoup`
+    - HTML, XML 등의 마크업 언어 Scraping을 위한 대표적인 도구이다.
+    - `lxml` , `html5lib` 와 같은 parser를 사용한다.
+    - 속도는 상대적으로 느리나, 사용법이 간편하고 레퍼런스가 많아 자주 사용된다.
+
+    ```python
+    # 데이터 다운로드 받기 예제
+    from bs4 import BeautifulSoup
+
+    with open('books.xml', 'r', encoding='utf8') as books_file:
+    	books_xml = books_file.read() # File을 String으로 읽어오기
+
+    soup = BeautifulSoup(books_xml, 'lxml') # lxml Parser를 사용해서 데이터 분석
+
+    # author가 들어간 모든 element 추출
+    for book_info in soup.find_all('author'):
+    	print(book_info)
+    	print(book_info.get_text())
+    ```
+
+### JSON
+
+`JavaScript Object Notation` 의 준말로, 원래는 웹 언어인 `JavaScript`의  데이터 객체 표현 방식이었다.
+
+XML에 비해 다음과 같은 장점이 있어 현재는 XML의 대체제로 많이 활용되고 있다.
+
+- **간결성** → 기계와 인간이 이해하기 편하다
+- **데이터 용량이 적다**
+- **Code로의 전환이 쉽다**
+
+Python에서는 Dict Type으로 전환할 수 있는 데이터형식이며, `JSON` 모듈을 이용하여 파싱 및 저장이 가능하다.
+
+현재 웹에서 제공하는 API는 대부분 정보 교환시 JSON을 활용하고있다.
+
+```json
+// json_example.json
+
+{"employees": [
+	{"firstName":"John", "lastName":"Doe"},
+	{"firstName":"Anna", "lastName":"Smith"},
+	{"firstName":"Peter", "lastName":"Jones"},
+]}
+```
+
+```python
+import json
+
+with open('json_example.json', 'r', encoding='utf8') as f:
+	contents = f.read()
+	json_data = json.loads(contents)
+	print(json_data['employees'])
+
+# 반대로, json.dumps로 딕셔너리 타입을 json으로 바꾸어 저장할수도 있다.
+with open('data.json', 'w') as f:
+	json.dump(json_data, f)
+```
+
+위에서 소개한 여러 데이터 타입들을 크롤링 할 때 막막하다면, 다음의 레퍼런스를 참고하자.
+
+[**파이썬 웹크롤링과 자동화에 대한 A to Z**](https://wikidocs.net/book/4706)
