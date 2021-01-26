@@ -182,7 +182,7 @@ def angle(x,y):
 
 - 행렬곱을 통해 **벡터를 다른 차원의 공간으로 보낼 수 있다**.
 - 이처럼 행렬곱을 통해 **패턴을 추출**할 수 있고**, 데이터를 압축**할 수도 있다.
-- 이런 행렬곱의 연산자기능을 **`linear transform`**, `**선형 변환`** 이라고 말하기도 한다.
+- 이런 행렬곱의 연산자기능을 **`linear transform`**, **`선형 변환`** 이라고 말하기도 한다.
     - 딥러닝은 선형 변환과 비선형 함수들의 합성으로 이루어져있다.
 
 ## 행렬간의 연산
@@ -271,13 +271,17 @@ array([[ 1.00000000e+00, -2.22044605e-16],
 역행렬이 없어 유사역행렬을 구할 때, 행의 수가 더 많으면 반드시 유사역행렬을 먼저 곱해주어야하고, 열의 수가 많으면 반드시 유사역행렬을 나중에 곱해주어야한다.
 
 </Warning>
+
 #
+
 ### 응용하기 - 연립방정식 해 구하기
 
 `np.linalg.pinv` 를 이용해 **연립방정식의 해**를 구할 수 있다.
 
 ![simultaneous_equation](./img/AI_math/simultaneous_equation.png)
+
 #
+
 ### 응용하기2 - 선형회귀분석
 
 `np.linalg.pinv`를 이용하여 데이터를 선형모델(linear model)로 해석하는 **선형회귀식**을 찾을 수 있다.
@@ -300,7 +304,7 @@ y_test = np.append(x, [1]) @ beta
 # Scikit Learn을 활용한 회귀분석
 
 from sklearn.linear_model import LinearRegression
-model = LinearRegression()
+model = LinearRegression() # 선형회귀식
 model.fit(X, y)
 y_test = model.predict(x_test)
 ```
