@@ -226,7 +226,9 @@ def angle(x,y):
 
 <Warning>
 
-numpy의 inner는 수식에서 말하는 내적과는 다르다. 수식에서는 보통 $tr(XY^T)$를 내적으로 계산한다. 그러나 inner는 두 행렬의 행 벡터만을 대상으로 한다.
+numpy의 inner는 수학에서 말하는 행렬의 내적과는 다르다. 수학에서는 보통 $tr(XY^T)$를 내적으로 계산한다. 이는 X 행렬의 각 행벡터와 Y 행렬의 각 행벡터를 내적하고,
+추가로 trace 연산을 수행한다. trace연산은 행렬의 대각합으로, 대각선에 위치한 값들을 전부 더해주어 최종적으로 스칼라 결과값을 반환한다.
+numpy의 inner는 이러한 tr과정은 연산하지 않고, XY^T까지만을 연산하므로 스칼라값을 반환하는 일반적인 내적과는 달리 또 다른 행렬이 나오게 된다.
 
 </Warning>
 
@@ -342,7 +344,9 @@ beta = np.linalg.pinv(X_) @ y
 y_test = np.append(x, [1]) @ beta
 ```
 
-이는 `sklearn` 의 `LinearRegression` 을 사용해도 같은 값을 얻을 수 있다.
+위 코드에서, 왜 절편항을 추가하는지는 포스트 최하단의 풀이를 참고하자.$^{(1)}$
+
+`sklearn` 의 `LinearRegression` 을 사용해도 같은 값을 얻을 수 있다.
 
 ```python
 # Scikit Learn을 활용한 회귀분석
@@ -352,3 +356,116 @@ model = LinearRegression() # 선형회귀식
 model.fit(X, y)
 y_test = model.predict(x_test)
 ```
+
+---
+
+$^{(1)}$
+
+$$
+X = \begin{bmatrix}
+1 \\
+2 \\
+3 \\
+4 \\
+5  
+\end{bmatrix}
+Y = \begin{bmatrix}
+1 \\
+3 \\
+2 \\
+4 \\
+2  
+\end{bmatrix}
+$$
+
+인 $X$와 $Y$가 있다고 하자.
+
+$Y = XA$ 라고 할때, $A$의 차원은 **1x1**이어야 한다.
+
+따라서 $A = \begin{bmatrix}a\end{bmatrix}$라고 하면,
+
+$$
+\begin{bmatrix}
+1 \\
+3 \\
+2 \\
+4 \\
+2  
+\end{bmatrix} = 
+\begin{bmatrix}
+1 \\
+2 \\
+3 \\
+4 \\
+5  
+\end{bmatrix}
+\begin{bmatrix}
+a
+\end{bmatrix}
+$$
+
+위와 같은 형태가 되므로,
+
+- 1 = a
+- 3 = 2a
+- 2 = 3a
+- 4 = 4a
+- 2 = 5a
+
+즉, $y=ax$형태가 되어 y절편을 구할수가 없다. 이는 선형방정식의 상수항을 표현할 수 없는 결과를 낳는다.
+
+이번엔 **intercept항을 추가했을 때**를 살펴보자.
+
+$$
+X\_ = \begin{bmatrix}
+1 \\
+2 \\
+3 \\
+4 \\
+5  
+\end{bmatrix}
+Y = \begin{bmatrix}
+1 \\
+3 \\
+2 \\
+4 \\
+2  
+\end{bmatrix}
+$$
+
+$Y = X\_A$ 라고 할때, $A$의 차원은 **2x1**이어야 한다.
+
+따라서 $A = \begin{bmatrix}a \\b\end{bmatrix}$라고 하면,
+
+$$
+\begin{bmatrix}
+1 \\
+3 \\
+2 \\
+4 \\
+2  
+\end{bmatrix} = 
+\begin{bmatrix}
+1&1 \\
+2&1 \\
+3&1 \\
+4&1 \\
+5&1  
+\end{bmatrix}
+\begin{bmatrix}
+a\\
+b
+\end{bmatrix}
+$$
+
+위와 같은 형태가 되므로,
+
+- 1 = a **+ b**
+- 3 = 2a **+ b**
+- 2 = 3a **+ b**
+- 4 = 4a **+ b**
+- 2 = 5a **+ b**
+
+즉, $y=ax+b$ 형태가 되어 y절편을 표현할 수 있게 된다.
+
+*BoostCamp AI Tech 1기 **`성예닮`** 조교님의 풀이를 참고했습니다.
