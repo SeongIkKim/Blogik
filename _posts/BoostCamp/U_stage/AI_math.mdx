@@ -305,6 +305,9 @@ array([[ 1.00000000e+00, -2.22044605e-16],
 
 </Warning>
 
+유사역행렬을 구하는 과정에 대해 더 자세하게 알아보고 싶다면 다음 동영상을 참조하자.
+[Linear Systems of Equations, Least Squares Regression, Pseudoinverse](https://www.youtube.com/watch?v=PjeOmOz9jSY&ab_channel=SteveBrunton)
+
 #
 
 ### 응용하기 - 연립방정식 해 구하기
@@ -333,12 +336,11 @@ array([[ 1.00000000e+00, -2.22044605e-16],
 ```python
 # Moore-Penrose 역행렬로 구현하였을 때
 # 선형방정식에서 bias항(b)를 표현하기 위해 절편 1을 추가한다. 
+# 절편항을 추가하지 않으면, beta의 차원은 1x1이 되는데, 이경우 y=ax가 되어 Y와 X의 방정식이 성립하지 않는다.
 X_ = np.array([np.append(x,[1]) for x in x]) # y절편(intercept)항을 직접 추가해주어야한다.
 beta = np.linalg.pinv(X_) @ y
 y_test = np.append(x, [1]) @ beta
 ```
-
-[위의 코드에 나오는 intercept항, 즉 bias term을 추가하는 것은 computational graph를 만들고 gradient descent를 이용해 해를 찾을 때 사용하는 트릭이라는데, 더 공부해본 뒤 보충해야 할 듯하다.]
 
 이는 `sklearn` 의 `LinearRegression` 을 사용해도 같은 값을 얻을 수 있다.
 
