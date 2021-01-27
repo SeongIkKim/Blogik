@@ -350,7 +350,9 @@ df.add(s2, axis=0)
 
 이 때, `lambda`와 조합할 수 있고, function 대신 dict, sequence 형 자료 등으로 대체도 가능하다.
 
-비슷한 기능으로 `replace` 가 있다. `map` 함수의 기능 중 **데이터 변환기능**만 담당한다. **<U>즉, `map` 처럼 함각 데이터에 함수를 적용할 수 없고, dict에서 정해진 value값으로 바꿔주기만 한다.<U>**
+
+비슷한 기능으로 `replace` 가 있다.  
+`map` 함수의 기능 중 **데이터 변환기능**만 담당한다. **<U>즉, `map` 처럼 데이터에 함수를 적용할 수 없고, dict에서 정해진 value값으로 바꿔주기만 한다.</U>**
 
 #
 
@@ -409,7 +411,7 @@ mean	32446.292622	66.59264	45.32849
 
 `apply`와는 다르게, `Series` 단위가 아닌 **element 단위로 함수를 적용**한다.
 
-- <U>`apply`를 `dataframe` 이 아닌 `Series` 에 적용시키면, `applymap`과 동일한 기능을 수행한다.</U>
+- **<U> `apply`를 `dataframe` 이 아닌 `Series` 에 적용시키면, `applymap`과 동일한 기능을 수행한다.</U>**
 
 ```python
 
