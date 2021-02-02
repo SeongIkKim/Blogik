@@ -1,6 +1,6 @@
 ---
 title: 딥러닝 베이직 - 03.최적화 기법
-date: 2021-02-01
+date: 2021-02-02
 tags: [BoostCamp AI Tech, Optimization, Generalization, Over-fitting, Cross-validation, Momentum, Adagrad, Adam, Regularization]
 excerpt: Optimization by 최성준 교수님, BoostCamp AI Tech 3주차
 ---
@@ -174,7 +174,7 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
 
 ### Early Stopping
 
-![early-stopping](early-stopping.png) 
+![early-stopping](./img/optimization/early-stopping.png) 
 
 validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전에 학습을 멈추어 버리는것을 **`Early stopping`**이라고 한다.
 
@@ -188,7 +188,7 @@ validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전�
 
 ### Data Augmentation
 
-![data-augmentation](/data-augmentation.png)
+![data-augmentation](./img/optimization/data-augmentation.png)
 
 일반적으로 데이터가 많으면 모델의 성능이 더 좋다. 거꾸로 말하면, 데이터가 없으면 딥러닝 모델은 다른 머신러닝 방법론에 비하여 열등하다.
 
@@ -200,7 +200,7 @@ validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전�
 
 ### Noise Robustness
 
-![noise-robustness](/noise-robustness.png)
+![noise-robustness](./img/optimization/noise-robustness.png)
 
 **`Noise Robustness`**는 입력데이터에 Noise를 집어넣는것이다. Data Augmentation과 다른점은, **단순히 입력에만 Noise를 집어넣는 것이 아니라 weight에도 집어넣는 것**을 의미한다.
 
