@@ -19,7 +19,9 @@ excerpt: CNN 첫걸음 맛보기 by 임성빈 교수님, BoostCamp AI Tech 3주�
 
 **`Convolution 연산`**은 기존의 MLP 방식과는 달리, **`커널(kernel, 필터)`**을 **입력벡터 상에서 움직여가면서** 선형 모델과 합성함수가 적용되는 구조이다.
 
-$$h_i = \sigma\Bigg(\sum^k_{j=1}V_jx_{i+j-1}\Bigg)$$
+$$
+h_i = \sigma\Bigg(\sum^k_{j=1}V_jx_{i+j-1}\Bigg)
+$$
 
 - $h_i$는 $i$번째 히든레이어를 의미한다.
 - $k$는 커널(필터) 사이즈를 의미한다.
@@ -30,9 +32,12 @@ $$h_i = \sigma\Bigg(\sum^k_{j=1}V_jx_{i+j-1}\Bigg)$$
 
 Convolution 연산의 수학적 의미는 **커널을 이용해 신호(signal)을 국소적으로 증폭 혹은 감소시켜 정보를 추출 또는 필터링** 하는 것이다. 엄밀히 말하면 CNN에서 사용하는 연산은 convolution이 아니고 **`cross-correlation`**이라고 부르지만, 관습적으로 Convolution으로 부르곤 한다.
 
-$$\textrm{continuous} \quad [f*g](x) = \int_\mathbb{R^d}f(z)g(x+z)dz = \int_\mathbb{R^d}f(x+z)g(z)dz = [g*f](x)$$
-
-$$\textrm{discrete} \quad [f*g](i) = \sum_{a\in \mathbb{Z^d}}f(a)g(i+a) = \sum_{a\in\mathbb{Z^d}}f(i+a)g(a) = [g*f](i)$$
+$$
+\begin{aligned}
+\textrm{continuous} \quad [f*g](x) &= \int_\mathbb{R^d}f(z)g(x+z)dz = \int_\mathbb{R^d}f(x+z)g(z)dz = [g*f](x)\\
+\textrm{discrete} \quad [f*g](i) &= \sum_{a\in \mathbb{Z^d}}f(a)g(i+a) = \sum_{a\in\mathbb{Z^d}}f(i+a)g(a) = [g*f](i)
+\end{aligned}
+$$
 
 - $x+z$ 또는 $i+a$가 들어간 함수값은 신호를 의미한다.
 - $z$ 또는 $a$만 들어간 함수 값은 커널을 의미한다.
@@ -47,7 +52,7 @@ CNN을 수식만으로 이해하기는 어려우므로, graphical하게 이해�
 
 ### 영상처리
 
-[](https://webnautes.tistory.com/1044)
+[영상처리 강좌 3 - 컨볼루션(Convolution)과 스무딩(Smoothing), 샤프닝(Sharpening)](https://webnautes.tistory.com/1044)
 
 위 링크에서와 같이, Convolution Network의 적용 커널에 따라 하나의 이미지를 여러 형태로 차용할 수 있다.
 
@@ -55,11 +60,15 @@ CNN을 수식만으로 이해하기는 어려우므로, graphical하게 이해�
 
 **<U>데이터의 성격에 따라 사용하는 커널을 다르게</U>** 하며, 다차원으로 Convolution 연산을 할 수 있다.
 
-$$\textrm {1D-conv} \quad [f*q](i) = \sum^d_{p=1}f(p)g(i+p)\\
-\textrm {2D-conv} \quad [f*q](i,j) = \sum_{p,q}f(p,q)g(i+p,j+q) \\
-\textrm {3D-conv} \quad [f*q](i,j,k) = \sum_{p,q,r}f(p,q,r)g(i+p,j+q,k+r)$$
+$$
+\begin{aligned}
+\textrm {1D-conv} \quad [f*q](i) &= \sum^d_{p=1}f(p)g(i+p)\\
+\textrm {2D-conv} \quad [f*q](i,j) &= \sum_{p,q}f(p,q)g(i+p,j+q) \\
+\textrm {3D-conv} \quad [f*q](i,j,k) &= \sum_{p,q,r}f(p,q,r)g(i+p,j+q,k+r)
+\end{aligned}
+$$
 
-- 여기서 $f$는 커널, $g$는 입력을 뜻한다.
+- 여기서$f$는 커널, $g$는 입력을 뜻한다.
 - 데이터의 종류
     - 1차원 데이터 - 음성, 텍스트 등
     - 2차원 데이터 - 흑백 영상 등
@@ -73,8 +82,12 @@ $$\textrm {1D-conv} \quad [f*q](i) = \sum^d_{p=1}f(p)g(i+p)\\
 
 입력 크기를 $(H,W)$, 커널 크기를 $(K_H,K_W)$, 출력 크기를 $(O_H,O_W)$라 하면, 출력 크기는 다음과 같이 계산한다.
 
-$$O_H = H-K_H+1\\
-O_W = W-K_W+1$$
+$$
+\begin{aligned}
+O_H &= H-K_H+1\\
+O_W &= W-K_W+1
+\end{aligned}
+$$
 
 가령, 28x28 입력을 3x3 커널로 2차원 Convolution 연산을 하면 26x26이 된다.
 
@@ -94,9 +107,13 @@ Convolution 연산도 선형변환인 것은 마찬가지이다. 따라서 기�
 
 다만, Convolution 연산은 **커널이 모든 입력 데이터에 공통으로 적용**되므로, **<U>역전파를 계산할 때(Convolution 연산에 미분할 때)에도 Convolution 연산이 나오게 된다.</U>**
 
-$$\frac{\partial}{\partial x}[f*g](x) = \frac{\partial}{\partial x}\int_{\mathbb{R}^d}f(y)g(x-y)dy \\
-= \int_{\mathbb{R}^d}f(y)\frac{\partial g}{\partial x}(x-y)dy \\
-= [f*g'](x)$$
+$$
+\begin{aligned}
+\frac{\partial}{\partial x}[f*g](x) &= \frac{\partial}{\partial x}\int_{\mathbb{R}^d}f(y)g(x-y)dy \\
+&= \int_{\mathbb{R}^d}f(y)\frac{\partial g}{\partial x}(x-y)dy \\
+&= [f*g'](x)
+\end{aligned}
+$$
 
 $\partial x$는 시그널 $g(x-y)$에 적용되어, $g'$에 대한 합성곱연산이 된다.
 
@@ -116,8 +133,12 @@ $O_1$에서 $X_3$로 전달된 $\delta_1$값은, 기존에 적용되었던 커�
 
 ![conv-back3](./img/cnn/conv-back3.png)
 
-$$\frac{\partial\mathcal{L}}{\partial w_1} = \delta_1x_1 + \delta_2x_2 + \delta_3x_3$$
+$$
+\frac{\partial\mathcal{L}}{\partial w_1} = \delta_1x_1 + \delta_2x_2 + \delta_3x_3
+$$
 
 이렇게 각 커널로 들어오는 모든 gradient들을 다 더하면 결국 convolution 연산과 동일한 연산이 이루어진다.
 
-$$\frac{\partial\mathcal{L}}{\partial w_i} = \sum_j\delta_jx_{i+j-1}$$
+$$
+\frac{\partial\mathcal{L}}{\partial w_i} = \sum_j\delta_jx_{i+j-1}
+$$

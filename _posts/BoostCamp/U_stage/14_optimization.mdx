@@ -74,9 +74,11 @@ $$
 Bias and Variance의 트레이드오프 관계는 오래된 주제이다. 아래의 식은 학습데이터에 노이즈가 껴 있음을 가정하고 있다.
 
 $$
-\mathbb{E}\Big[(t-\hat{f})^2\Big] =  \mathbb{E}\Big[(t-f+f-\hat{f})^2\Big]\\
-= \dots\\
-= \mathbb{E}\Big[(f-\mathbb{E}[\hat{f}])^2\Big] + \mathbb{E}\Big[(\mathbb{E}[\hat{f}]-\hat{f})^2\Big]+\mathbb{E}[\epsilon]
+\begin{aligned}
+\mathbb{E}\Big[(t-\hat{f})^2\Big] &=  \mathbb{E}\Big[(t-f+f-\hat{f})^2\Big]\\
+&= \dots\\
+&= \mathbb{E}\Big[(f-\mathbb{E}[\hat{f}])^2\Big] + \mathbb{E}\Big[(\mathbb{E}[\hat{f}]-\hat{f})^2\Big]+\mathbb{E}[\epsilon]
+\end{aligned}
 $$
 
 - $t$는 True Target, 즉  목표치(정답)을 의미한다.
@@ -155,8 +157,8 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
     - 기존의 모멘텀은 관성으로 인해 local minimum 부근에서 수렴(converging)하지 못하는 문제가 있었지만, NAG는 모멘텀으로 업데이트 시 발생하는 변화를 미리 체크한 뒤 모멘텀을 결정하므로 좀 더 minimum에 빠르게 수렴할 수 있다.
 4. **`Adagrad`**
     - 이전까지의 모멘텀방식과 다른 ADA(adaptive) 방식
-    - $G$에 지금까지의 gradient$^2$ 합을 저장시키고, 역수에 집어넣는다. 따라서 많이 변한 파라미터는 적게 변화하게되고, 적게 변한 파라미터는 많이 변화하게 된다.
-    - G가 계속 커지기 때문에, 분모가 점점 커지므로 learning rate가 0에 수렴해 학습이 멈춘다는 문제가 있다.
+    - $G$에 지금까지의 gradient 제곱 합을 저장시키고, 역수에 집어넣는다. 따라서 많이 변한 파라미터는 적게 변화하게되고, 적게 변한 파라미터는 많이 변화하게 된다.
+    - $G$가 계속 커지기 때문에, 분모가 점점 커지므로 learning rate가 0에 수렴해 학습이 멈춘다는 문제가 있다.
 5. **`Adadelta`**
     - Adagrad에서 $G$가 계속 커지는 문제를 exponential moving average를 통해 해결하려는 방식
         - 지수이동평균은 최근 데이터에 가중치를 부여하고, 과거의 데이터일수록 영향력이 작아지는 형태를 띈다.
@@ -170,7 +172,7 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
     - adagrad랑 adadelta랑 섞어놓은 듯한, 과거에 많이 사용되었던 방식이다.
 7. **`Adam`**
     - Adaptive와 Momentum 방식들을 합친 것으로, 가장 많이 사용하는 방식이다.
-    - 모멘텀 $m$과 gradient$^2$값들의 합 $v$을 사용한다.
+    - 모멘텀 $m$과 gradient 제곱 값들의 합 $v$을 사용한다.
     - $\epsilon$은 division by zero를 막기 위한 하이퍼파라미터인데, 아주 작은 값을 넣는다. 실제로는 이 값을 잘 조정하는것이 practical한 성능에 큰 영향을 주는 것으로 나타났다.
         - 0이 아니면서 0에 얼마나 가깝게 만드는가?
 
