@@ -21,7 +21,7 @@ excerpt: Optimization by 최성준 교수님, BoostCamp AI Tech 3주차
 **`Generalization Gap`**은 **학습오류(Training Error)와 테스트오류(Test Error)사이의 간극**을 의미한다. 좋은 **`일반화 성능(Generalization Performace)`**이 보장되어있다는 것은 이 갭이 작다는 말이다. 이는 곧, **해당 모델의 (테스트 데이터에 대한) 성능이 학습데이터와 비슷할 것**임을 나타낸다.
 
 그런데, 학습 데이터의 자체가 좋지 않아 모델의 성능이 떨어지는 경우가 있을수도 있다. 이 경우에도 학습 데이터와 테스트 데이터의 차이가 적다면 일반화 성능은 좋다고 표현한다. **<U>따라서, 일반화 성능이 좋다고해서 모델의 성능이 좋다는 것을 의미하지는 않는다.</U>**
-
+#
 ### Under-fitting vs over-fitting
 
 **`오버피팅(Overfitting, 과적합)`**은 학습 데이터에 대해서는 잘 동작하지만, 테스트 데이터에는 잘 동작하지 않는 것을 의미한다.
@@ -29,7 +29,7 @@ excerpt: Optimization by 최성준 교수님, BoostCamp AI Tech 3주차
 반대로, **`언더피팅(Underfitting, 과소적합)`**은 모델의 구성이 너무 간단하거나 학습을 너무 적게 해서 학습 데이터도 잘 맞추지 못하는 것을 의미한다.
 
 이는 개념적인 이야기라서, 해당 모델이 오버피팅/언더피팅임을 판단하는 기준은 절대적이지 않다.
-
+#
 ### Cross-validation
 
 데이터를 분리하여, 학습데이터는 학습만, 테스트 데이터는 모델의 성능을 테스트하는 validation만 수행한다.
@@ -55,6 +55,7 @@ excerpt: Optimization by 최성준 교수님, BoostCamp AI Tech 3주차
 
 </Warning>
 
+#
 ### Bias-variance tradeoff
 
 ![bias-and-variance](./img/optimization/bias-and-variance.png)
@@ -62,13 +63,14 @@ excerpt: Optimization by 최성준 교수님, BoostCamp AI Tech 3주차
 **`분산(Variance)`**은 **input을 넣었을 때 얼마나 output이 일관적으로 나오는가**를 나타낸다. 일반적으로 Variance가 낮은 모델들은 간단한 모델들이다. 이에 비해 Variance가 높은 모델들은 input에 따라 output이 비교적 크게 바뀌므로, 오버피팅될 가능성이 높다.
 
 사격에서의 탄착군 형성을 생각해보자. **<U>중요한 것은 과녁 중심을 얼마나 맞히느냐가 아니라 탄착지점이 얼마나 모여있느냐</U>**이다. 탄착군이 모여있으면, 가늠쇠를 조정하여 탄착군을 과녁 중앙으로 shift하면 된다.
-
+#
 **`편향(Bias)`**은 분산과 관계없이, **평균값이 목표치(True Target)에 얼마나 접근했는가**를 나타낸다. 탄착군이 형성되지 않더라도, 점들의 평균치가 과녁 중앙에 가까이 갔다면 편향이 낮은 것이다.
 
 $$
 \textrm{Given}\ D = \{(x_i,t_i)\}^N_{i=1}, \quad\textrm{Where}\quad t = f(x) + \epsilon \quad \textrm{and} \quad  \epsilon \sim \mathcal{N}(0,\sigma^2)
 $$
 
+#
 Bias and Variance의 트레이드오프 관계는 오래된 주제이다. 아래의 식은 학습데이터에 노이즈가 껴 있음을 가정하고 있다.
 
 $$
@@ -83,14 +85,17 @@ $$
 
 Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 줄여야하는데, 이 중 **bias와 variance는 한 쪽을 줄이면 다른 한 쪽이 늘어나는 관계**이다. 근본적으로 **둘 모두를 줄이기는 힘들다**는 fundamental이 존재한다.
 
+#
 ### Bootstrapping
 
 '부츠 끈을 들어서 하늘을 날겠다'라는 의미의 bootstrap라는 어원에서 유래하였다. '지금 가지고 있는 것으로 어떻게든 활용하여 해결하겠다'라고 볼 수 있는데, 통계학에서는 가설검증이나 metric 계산 이전에 랜덤샘플링을 적용하는 방법을 일컫는다.
 
 서로 다른 학습데이터를 사용했을 때 모델의 예측은 차이가 나게 되는데, 이 **예측의 통계(또는 일치도)를 보고 전체적인 모델의 불확실성(uncertainty)를 예측**하고자 할 때 **`부트스트래핑`**을 사용한다.
 
+#
 여러가지로 활용될 수 있지만, 일반적으로는 **학습데이터가 고정되어있을 때 서브샘플링을 통해 여러 학습데이터를 만들고 여러 모델과 metric을 만들어 사용하겠다**는 말이다.
 
+#
 ### Bagging and Boosting
 
 ![bootstrapping-boosting](./img/optimization/bootstrapping-boosting.png)
@@ -99,12 +104,14 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
 
 직관적으로는 모든 데이터를 학습데이터로 썼을 때 가장 좋은 성능의 모델이 나올 것 같지만, 실제로는 **오히려 데이터들을 서브샘플링 한 뒤 여러 모델의 예측을 평균낸 것이 더 성능이 좋은 경우가 많다.** 
 
+#
 **`Boosting`**은  조금 다른 방법이다.
 
 학습데이터를 여러 개로 샘플링한 뒤, 하나의 모델을 가지고 각 샘플링 데이터들을 차례대로 학습시킨다. 해당 모델이 제대로 예측하지 못하는 데이터들에 대해서는, **해당 데이터들만 따로 학습시키는 모델을 새로 만든다**. 이 개개의 모델들을 `weak learner`라고 부른다.
 
 이렇게 여러개의 모델을 만든 뒤 sequential하게 합쳐서 하나의 strong learner를 만드는 것을 부스팅이라고 한다. 
 
+#
 ## Practical Gradient Descent Method
 
 ### 경사하강법 - 배치 방식에 따라
@@ -117,6 +124,7 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
 - `Batch Gradient Descent`
     - 한번에 모든 데이터로 gradient를 구해서 업데이트하는 방식
 
+#
 ### 배치사이즈는 얼마나 커야하는가?
 
 ![batch-size](./img/optimization/batch-size.png)
@@ -125,12 +133,14 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
 
 반대로, 배치사이즈가 작을수록 noise의 영향력이 커지므로 Sharp Minimum에서 탈출할 확률이 높다.
 
+#
 해당 실험을 다룬 [On Large-batch Training for Deep Learning : Generalization Gap and Sharp Minima, 2017](https://arxiv.org/pdf/1609.04836.pdf) 논문을 참조해보자.
 
 자세한 설명은 아래 글을 참조한다.
 
 [Small Batch Size in Deep Learning](https://iamseungjun.tistory.com/3)
 
+#
 ### Gradient Descent Methods
 
 1. **`(Stochastic) Gradient Descent`**
@@ -168,16 +178,19 @@ Cost를 최소화하기 위해 총 세 파트, [bias$^2$, variance, noise]를 �
 
 [Gradient Descent Optimization Algorithms 정리](http://shuuki4.github.io/deep%20learning/2016/05/20/Gradient-Descent-Algorithm-Overview.html)
 
+#
 ## Regularization
 
 학습을 방해하도록 규제함으로써, 모델이 학습 데이터에만 피팅되는것이 아니라 테스트 데이터에서도 잘 동작하도록 만드는 것, 즉 오버피팅을 피하도록 하는 것을 **`정규화(regularization)`**이라고 한다.
 
+#
 ### Early Stopping
 
 ![early-stopping](./img/optimization/early-stopping.png) 
 
 validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전에 학습을 멈추어 버리는것을 **`Early stopping`**이라고 한다.
 
+#
 ### Parameter Norm Penalty
 
 **`Parameter Norm Penalty`**는 신경망의 파라미터가 너무 커지지 않도록 조절하는 것을 의미한다.
@@ -186,6 +199,7 @@ validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전�
 
 파라미터의 크기가 크지않은, 즉 부드러운(smooth) 함수일수록 일반화성능(Generalization Performance)이 좋을것이라는 가정에 기초하고 있다.
 
+#
 ### Data Augmentation
 
 ![data-augmentation](./img/optimization/data-augmentation.png)
@@ -194,10 +208,12 @@ validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전�
 
 그러나 데이터셋이 어느정도 커지게 되면, 딥러닝 모델은 기존의 머신러닝 방법론들이 따라갈 수 없는 표현력을 가지게 된다. 결국 관건은 데이터의 양이다.
 
+#
 **`Data Augmentation`**은 어떤 식으로든 내가 **가지고 있는 데이터를 변형시켜서 데이터 풀을 늘리는 방법**을 의미한다. 단, 변화는 이미지의 레이블이 바뀌지 않는 한도 내에서 수행해야한다.
 
 - 예를 들어, MNIST 데이터에서 6을 변형시키겠다고 뒤집어 9로 만드는것은 잘못된 data augmentation이다.
 
+#
 ### Noise Robustness
 
 ![noise-robustness](./img/optimization/noise-robustness.png)
@@ -206,6 +222,7 @@ validation 에러와 학습 에러의 차이가 날 정도로 학습하기 전�
 
 정확한 원리가 규명되지는 않았고, 실험결과 상 데이터 풀이 많아질 뿐 아니라, weight 값을 흔들어 모델의 성능에 도움이 된다고 밝혀졌다.
 
+#
 ### Label Smoothing
 
 Data Augmentation과 비슷하지만, **`Label Smoothing`**은 랜덤한 학습 데이터를 두 개 뽑아서 조작하여 사용한다는 차이점이 있다.
@@ -219,12 +236,14 @@ Data Augmentation과 비슷하지만, **`Label Smoothing`**은 랜덤한 학습 
 
 이를 통해 **decision boundary를 더 부드럽게 만들어준다**.
 
+#
 ### Dropout
 
 **`Dropout`**은 순전파의 각 과정에서 신경망의 가중치 중 특정 비율을 0으로 바꾸는 것을 의미한다.
 
 이를 통해 각각의 뉴런들이 좀 더 robust한 feature를 담을 수 있다고 한다.
 
+#
 ### Batch Normalization
 
 **`Batch Normalization`**은 **각 레이어의 statistics(활성화값, 또는 출력값)를 정규화**시키는 것을 의미한다.
