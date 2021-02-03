@@ -14,7 +14,7 @@ excerpt: CNN 첫걸음 맛보기 by 임성빈 교수님, BoostCamp AI Tech 3주�
 기존의 `다층신경망(MLP)`는 각 뉴런들이 선형모델과 활성함수로 **모두 연결된(fully connected)** 구조였다.
 
 이런 다층신경망의 경우는 **각 성분 $h_i = \sigma(\sum^p_{j=1}W_{ij}x_j)$에 대응하는 가중치 행 $W_i$가 필요**했다.
-
+#
 ## Convolution 연산 이해하기
 
 **`Convolution 연산`**은 기존의 MLP 방식과는 달리, **`커널(kernel, 필터)`**을 **입력벡터 상에서 움직여가면서** 선형 모델과 합성함수가 적용되는 구조이다.
@@ -54,7 +54,8 @@ CNN을 수식만으로 이해하기는 어려우므로, graphical하게 이해�
 
 [영상처리 강좌 3 - 컨볼루션(Convolution)과 스무딩(Smoothing), 샤프닝(Sharpening)](https://webnautes.tistory.com/1044)
 
-위 링크에서와 같이, Convolution Network의 적용 커널에 따라 하나의 이미지를 여러 형태로 차용할 수 있다.
+위 링크에서와 같이, Convolution Network의 커널을 적용할 때 어느 위치를 찍느냐에 따라 하나의 이미지를 여러 형태(blur, emboss, outline 등)로 해석할 수 있다.
+
 
 ### 다차원에서의 Convolution 연산
 
