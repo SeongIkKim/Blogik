@@ -110,6 +110,8 @@ module.exports = {
       options: {
         plugins: [
           // Somehow need to be defined under both gatsby-plugin-mdx & gatsby-transformer-remark to work
+          `gatsby-remark-copy-linked-files`, // gif file
+
           {
             resolve: `gatsby-remark-autolink-headers`,
             options: {

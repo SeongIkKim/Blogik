@@ -16,18 +16,19 @@ const styleConfig = {
 
   /* Colors for each Light / Dark Theme
     ========================================= */
-  headerColorLight: "#eee",
-  headerColorDark: "#252427",
+  headerColorLight: "#ffb732",
+  headerColorDark: "#6666ff",
 
-  bgColorLight: "#fff",
+  bgColorLight: "#eeeeee",
   bgColorDark: "#292a30",
 
   /* background colors surrounding profile & posts in main page */
-  bgSubColorLight: "#f7f7f7",
-  bgSubColorDark: "#26272e",
+  bgSubColorLight: "#cccccc",
+  bgSubColorDark: "#373835",
 
   /* Font Colors */
-  fontColorLight: "#313131",
+  // fontColorLight: "#313131",
+  fontColorLight: "#420420",
   fontSubColorLight: "#808080",
 
   fontColorDark: "#d3d3dc",
@@ -44,7 +45,7 @@ const styleConfig = {
   scrollbarHoverDark: "#818ca4",
 
   /* Underline Color */
-  underlineColorLight: "#8807ff",
+  underlineColorLight: "#ff7f50",
   underlineColorDark: "#f2c033",
 
   /* Scroll Progress Bar Color */

@@ -1,5 +1,5 @@
 ---
-title: CNN의 원리
+title: RNN의 원리
 date: 2021-02-04
 tags: [BoostCamp AI Tech, RNN]
 excerpt: RNN 첫걸음 by 임성빈 교수님, BoostCamp AI Tech 3주차
@@ -27,19 +27,25 @@ excerpt: RNN 첫걸음 by 임성빈 교수님, BoostCamp AI Tech 3주차
 
 이전 시퀀스의 정보를 가지고 앞으로 발생할 데이터의 확률분포를 다루기 위하여, `조건부확률`을 이용할 수 있다.
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(X1_,\dots,X_t)&=P(X_t|X_1,\dots,X_{t-1})P(X_1,\dots,X_{t-1})\\
 &= P(X_t|X_1,\dots,X_{t-2})P(X_1,\dots,X_{t-2})\times P(X_1,\dots,X_{t-2})\\
 &=\prod^t_{s=1}P(X_s|X_{s-1},\dots,X_1)
-\end{aligned}$$
+\end{aligned}
+$$
 
 현재 시점인 $t$  까지의 확률분포를 알기 위해, $t-1$까지의 확률분포를 구한다. $t-1$의 확률분포를 구하기 위해 $t-2$까지의 확률분포를 구한다. 이를 반복하여 최초까지 내려가면, 최초의 시점부터 순차적으로 조건부확률을 곱하는 식으로 일반화할 수 있다.
 
-$$X_t \sim P(X_t|X_{t-1},\dots,X_1)$$
+$$
+X_t \sim P(X_t|X_{t-1},\dots,X_1)
+$$
 
 다만, 위의 조건부확률과는 달리 시퀀스 데이터를 분석할 때 일반적으로는 과거의 **모든 정보(즉, 최초시점부터의 모든 정보)를 사용하지는 않는다**. 최근 어느 시점까지의 정보를 이용하거나, 몇 개의 과거 정보들을 truncation하기도 한다. 필요성에 따라서 어느 시점까지 데이터를 활용할 지 모델링이 달라질 수 있다.
 
-$$X_{t+1} \sim P(X_{t+1}| \textcolor{red}{X_t,X_{t-1}\dots,X_1})$$
+$$
+X_{t+1} \sim P(X_{t+1}| \textcolor{red}{X_t,X_{t-1}\dots,X_1})
+$$
 
 따라서, $X_{t+1}$을 예측하기 위한 **조건부확률에 들어가는 데이터 길이 $X_{t},X_{t-1},\dots,X_1$는 가변적**이므로, 시퀀스 데이터를 다루기 위해서는 길이가 가변적인 데이터를 다룰 수 있는 모델이 필요하다.
 
@@ -47,14 +53,18 @@ $$X_{t+1} \sim P(X_{t+1}| \textcolor{red}{X_t,X_{t-1}\dots,X_1})$$
 
 또, 문제에 따라 먼 과거의 정보들을 고려해야 하기도하고, $\tau$가 바뀌는 경우가 있다. 이런 경우 사용되는 방법이 RNN의 기본 모형인 **`잠재 AR 모델(Latent Autoregressive Models)`**, 즉 **`잠재자기회귀모델`**이다.
 
-$$X_t \sim P(X_t|X_{t-1},\textcolor{red}{\dots,X_1}) \textcolor{red}{\rarr H_t}\\
-X_{t+1} \sim P(X_{t+1}|X_t,\textcolor{red}{X_{t-1}\dots,X_1})\textcolor{red}{\rarr H_{t+1}}$$
+$$
+_t \sim P(X_t|X_{t-1},\textcolor{red}{\dots,X_1}) \textcolor{red}{\rarr H_t}\\
+X_{t+1} \sim P(X_{t+1}|X_t,\textcolor{red}{X_{t-1}\dots,X_1})\textcolor{red}{\rarr H_{t+1}}
+$$
 
 이 경우 $X_t$ 를 예측하기 위해 직전정보인 $t-1$ 시점의 정보 $X_{t-1}$를 제외한 나머지 $X_{t-2},\dots$의 정보들을 $H_t$라는 **`잠재변수`**로 인코딩하여 이용한다.
 
 따라서, 직전 시점의 정보와 잠재변수$H$ 두 가지만 가지고 예측할 수 있기 때문에 고정된 길이의 데이터를 가지고 모델링 할 수 있게 된다.
 
-$$H_t = \textrm{Net}_\theta(H_{t-1}, X_{t-1})$$
+$$
+H_t = \textrm{Net}_\theta(H_{t-1}, X_{t-1})
+$$
 
 이 때 잠재변수 $H_t$를 신경망을 통해 반복 사용하여 시퀀스 데이터의 패턴을 학습하는 모델을 **`RNN`**이라고 한다.
 
@@ -64,19 +74,23 @@ $$H_t = \textrm{Net}_\theta(H_{t-1}, X_{t-1})$$
 
 가장 기본적인 RNN 모형은 MLP와 유사한 모형이다.
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 O_t &= H_tW^{(2)} + b^{(2)}\\
 H_t &= \sigma(X_tW^{(1)}+b^{(1)})
-\end{aligned}$$
+\end{aligned}
+$$
 
 이 때, $W^{(1)}$과 $W^{(2)}$는 시퀀스와 상관없이 불변인 가중치 행렬이다.
 
 이 모델의 문제점은, 입력이 현재 시점($t$)과 관련된 것만 들어오기 때문에, **예측할 때 과거 정보를 다룰 수 없다**는 것이다. 따라서 과거 정보를 다루기 위해 RNN에서는 과거의 잠재변수 $H_t$를 복제하여 다음 순서의 잠재변수를 인코딩하는 데에 사용한다.
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 O_t &= H_tW^{(2)} + b^{(2)}\\
 H_t &= \sigma(X_tW_X^{(1)}+H_{t_1}W_H^{(1)}+b^{(1)})
-\end{aligned}$$
+\end{aligned}
+$$
 
 ![rnn_model](./img/rnn/rnn_model.png)
 
