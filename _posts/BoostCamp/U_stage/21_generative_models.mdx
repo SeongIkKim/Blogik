@@ -293,6 +293,7 @@ $$
     - VAE는 어떤 입력이 주어졌을 때 likelihood를 측정하여 판별할 수 없다. 즉, explicit한 모델이 아니다.
 - **Prior Fitting Term이 미분가능해야한다.**
     - KL Divergence는 그 자체로 적분이 들어가있고, 이 적분이 intractable한 경우가 많다. 따라서 `Gaussian prior distribution`을 제외하고는 Closed Form이 잘 나오지 않는다.
+        - Closed Form은 수학적으로 유한한 Term으로 표현할 수 있는 항(또는 식)을 의미한다.
     - 그런데 SGD나 Adam같은 Optimizer를 사용하려면 KL Divergence를 포함한 Prior Fitting Term이 미분가능해야한다.
     - 따라서 대부분의 VAE는 Gaussian prior distribution를 사용한다. 그것이 Closed Form이 나오는 몇 안되는 분포이기 때문이다.
 - **일반적으로 `isotropic Gaussian`을 사용한다.**
