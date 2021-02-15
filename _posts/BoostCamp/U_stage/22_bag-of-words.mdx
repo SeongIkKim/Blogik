@@ -2,7 +2,7 @@
 title: NLP 01 - NLP와 Bag-of-Words란?
 date: 2021-02-15
 tags: [BoostCamp AI Tech, NLP, Natural Language Processing, Bag-of-Words]
-excerpt: Intro to LNP,Bag-of-Words 주재걸 교수님, BoostCamp AI Tech 4주차
+excerpt: Intro to LNP,Bag-of-Words by 주재걸 교수님, BoostCamp AI Tech 4주차
 ---
 본 정리 내용은 [Naver BoostCamp AI Tech](https://boostcamp.connect.or.kr/)의 edwith에서 학습한 내용을 정리한 것입니다.  
 사실과 다른 부분이 있거나, 수정이 필요한 사항은 댓글로 남겨주세요.
@@ -18,7 +18,7 @@ excerpt: Intro to LNP,Bag-of-Words 주재걸 교수님, BoostCamp AI Tech 4주�
 major conferences :  `ACL`, `EMNLP`, `NAACL`
 
 **`NLP`**란? - **`Natural Language Processing, 자연어처리`**
-
+#
 ### 자연어처리가 다루는 Task
 
 - `Low-level parsing`
@@ -35,7 +35,7 @@ major conferences :  `ACL`, `EMNLP`, `NAACL`
     - `question answering` - 질문의 대답에 해당하는 문장을 선택 i.e. 구글 검색시 미리보기
     - `dialog systems` - 챗봇처럼 대화를 수행
     - `summarization`
-
+#
 ### Text Mining
 
 major conference : `KDD`, `The WebConf(WWW)`, `WSDM`, `CIKM`, `ICWSM`
@@ -43,7 +43,7 @@ major conference : `KDD`, `The WebConf(WWW)`, `WSDM`, `CIKM`, `ICWSM`
 - 텍스트와 문서 데이터에서 유용한 정보 추출 - i.e. 방대한 뉴스데이터에서 특정 키워드에 연관된 트렌드 분석
 - `Document clustering(topic modeling, 문서 군집화)` - i.e. 뉴스데이터를 모아 주제별로 군집화
 - Computational social science - 빅데이터 기반 사회과학에 연관 i.e. 트위터 키워드 분석한 사회상 예측
-
+#
 ### Information retrieval 정보 검색
 
 major conferences: `SIGAR`, `WSDM`, `CIKM`, `RecSys`
@@ -51,7 +51,7 @@ major conferences: `SIGAR`, `WSDM`, `CIKM`, `RecSys`
 - 빅데이터 기반 사회과학에 연관이 있다.
 - 자연어처리나 텍스트마이닝에 비하여 상대적으로 성숙하였기 때문에 연구가 비교적 활발하지 않다.
 - 최근 핫한 분야인 추천시스템 쪽으로 발달하고 있다.
-
+#
 ## NLP 트렌드
 
 - **`Word Embedding`** - 주어진 텍스트 데이터를 단어단위로 분리하고, 각 단어를 다차원으로 이루어진 vector로 표현하는 것.
@@ -65,11 +65,11 @@ Transformer 모델처럼, 대부분의 NLP모델은 기계번역(machine transla
 - `BERT`, `GPT-3` 등
 
 이 방식으로 `transfer-learning(전이 학습)`을 각 task에 적용하였을 때, 기존의 특화 모델들보다 월등한 성능을 내었다.  따라서 **현재는 NLP task에 있어서 대규모 데이터를 처리하는 방식이 필수적이어서, 적은 GPU 자원으로는 연구하기 어렵게 되었다.**
-
+#
 ## Bag-of-Words
 
 **`Bag-of-Words`**란, 자연어처리에 딥러닝 기술이 적용되기 이전에 사용되던 방식으로, **단어 및 문서를 숫자(벡터) 형태로 나타내는 간단한 기법**이다.
-
+#
 ### 과정
 
 1. unique word를 포함하는 단어를 추출한다.
@@ -78,26 +78,29 @@ Transformer 모델처럼, 대부분의 NLP모델은 기계번역(machine transla
     - 모든 단어 간 cosine 유사도가 0이다.
 3. 문장이나 문서를 원-핫벡터의 합벡터, 즉 Bag-of-words 벡터로 나타낸다.
 4. Bag-of-words를 사용하여 Documents Classification을 수행한다.
-
+#
 ## Naive Bayes Classifier
 
 Bag-of-words를 사용하여 문서 분류(Documents Classification)를 수행하는 대표적인 방식이다.
-
+#
 ### 베이지안 룰(Bayes' Rule)
 
 Document $d$와 클래스 $c$가 있다고 할 때,
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 C_{MAP} &= \underset{c\in C}{\argmax}P(c|d)\\
 &= \underset{c\in C}{\argmax}\frac{P(d|c)P(c)}{P(d)}\\
 &= \underset{c\in C}{\argmax}P(d|c)P(c)\\
-
-\end{aligned}$$
+\end{aligned}
+$$
 
 - `MAP`은 'Maximum A Posteriori', 즉 most likely class를 뜻한다.
 - $P(d)$는 document $d$가 뽑힐 확률인데, 여기서 문서 $d$는 이미 정해져있다고 볼 수 있으므로  $P(d)$는 1이다. 따라서 분모를 제거한다.
 
-$$P(d|c)P(c) = P(w_1, w_2, \dots, w_n|c)P(c) \rarr p(c)\prod_{w_i\in W}P(w_i|c)$$
+$$
+P(d|c)P(c) = P(w_1, w_2, \dots, w_n|c)P(c) \rarr p(c)\prod_{w_i\in W}P(w_i|c)
+$$
 
 - $P(d|c)$는 특정 카테고리 $c$가 고정 되었을 때 문서 $d$가 나타날 확률을 의미하는데, 문서 $d$는 곧 $w_1,\dots,w_n$까지 n개 단어들이 동시에 나타나는 사건과 같다.
 - 따라서, **<U>각각의 단어들의 출현이 서로 독립이라고 가정할 때</U>**, 조건부독립을 활용하여 각 단어가 나타낼 수 있는 확률을 모두 곱한 $p(c)\prod_{w_i\in W}P(w_i|c)$로 나타낼 수 있다.
