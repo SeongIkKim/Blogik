@@ -36,11 +36,11 @@ $$
 - $C_t$ : **Cell State Vector**
 - $h_t$ : **Hidden State Vector**
 
-![lstm-chain][./img/nlp/lstm-chain.png]
+![lstm-chain](./img/nlp/lstm-chain.png)
 
-이 중 $**C_t$가 좀 더 완전하고 통합적인 정보를 제공**한다. $**h_t$는 $C_t$를 한번 더 가공(필터링)해서 해당 timestep에서 노출할 필요가 있는 정보들만 남긴 형태**라고 볼 수 있다.
+이 중 **$C_t$가 좀 더 완전하고 통합적인 정보를 제공**한다. **$h_t$는 $C_t$를 한번 더 가공(필터링)해서 해당 timestep에서 노출할 필요가 있는 정보들만 남긴 형태**라고 볼 수 있다.
 
-![lstm_gates](./img/nlp/lstm_gates)
+![lstm_gates](./img/nlp/lstm-gates.png)
 
 LSTM은 **주어진 $x_t$와  $h_{t-1}$을 바탕으로 4개의 게이트(gate)를 이용해 $C_{t-1}$를 수정하고 $h_t$를 계산**한다.
 
@@ -71,7 +71,7 @@ LSTM은 **주어진 $x_t$와  $h_{t-1}$을 바탕으로 4개의 게이트(gate)�
     $$
 
     - 최종 출력값 $h_t$는 tanh를 거친 $C_t$에 0과 1사이의 적절한 $o_t$와 element-wise product함으로써  Cell state 정보를 일정 비율로 작게 만들어(filtering) 내보내는 값이다.
-        - **<U>$C_t$는 이전까지의 모든 과거 정보를 담은 벡터, $h_t$는 해당 time step에서 예측값에 사용하기 위해 지금 당장 필요한 정보만을 ($C_t$로부터) 필터링한 값이다</U>**
+        - **<U>$C_t$는 이전까지의 모든 과거 정보를 담은 벡터, $h_t$는 해당 time step에서 예측값에 사용하기 위해 지금 당장 필요한 정보만을 ($C_t$로부터) 필터링한 값이다.</U>**
 
 - **`g`** : `Gate gate`, 현재 cell에 해당 정보를 얼마나(how much) 기록할것인가?
 
@@ -87,11 +87,11 @@ LSTM은 **주어진 $x_t$와  $h_{t-1}$을 바탕으로 4개의 게이트(gate)�
         - 이 때, Gate gate 값 $\tilde{C_t}$은 tanh연산을 거쳤으므로 범위가 -1~1이다. 따라서, $i_t \odot \tilde{C_t}$를 Cell state에 반영시키되, $\tilde{C_t}$가 반영의 방향(증감)을 정한다고 볼 수 있다.
     - 이후, 이전 Cell state가 forget gate 값 $f_t$와 더해져 새로운 $C_t$를 만든다.
 
-sigmoid 사용 : `**i`, `f`, `o`**
+sigmoid 사용 : **`i`, `f`, `o`**
 
 - 0과 1 사이의 값을 가지는 sigmoid의 특성 상 기존의 벡터 값을 일정 부분만 떼내어 보존하는 역할을 한다.
 
-tanh 사용 : `**g**`
+tanh 사용 : **`g`**
 
 - -1과 1 사이의 값을 가지는 tanh의 특성 상 현재 timestep에서 계산되는 유의미한 정보(증/감)를 담는 역할을 한다.(vanilla rnn에서의 마지막 tanh와 같음)
 
@@ -121,7 +121,7 @@ $$
 현재 값인 $\tilde{h_t}$와  과거의 정보를 통합한 값인 $h_{t-1}$의 비율을 조정하여, 합쳐서 1이 되도록 만들면서, **현재와 과거 값 간의 가중평균**을 내게 된다.
 
 - **<U>이 과정에서 게이트도 하나(fortget gate) 줄이게 되어, 계산양과 메모리 요구량을 줄여 경량화</U>**하였다.
-
+#
 ## LSTM과 GRU의 역전파
 
 기존의 RNN은 역전파 과정에서 $W_{hh}$를 계속 곱해주었기 때문에 Vanishing/Exploding Gradient 문제가 생겼었다.
@@ -129,7 +129,7 @@ $$
 그러나,  LSTM(과 GRU)의 역전파는 **Cell State Vector $C_{t-1}$에 그 때 그 때 다른 값으로 이루어지는 $f_t$를 곱하고, 필요로 하는 정보 $\tilde{C_t}$ 관련 항을 더해주어 Vanishing/Exploding Gradient를 막았다.**
 
 또한, 이러한 **덧셈 연산이 역전파과정에서 Gradient를 복사하여 매번 전달해주는 역할**을 하므로,, RNN에 비해 멀리있는 timestep의 gradient까지 큰 변형없이 전달하게 되어 결과적으로 **long-term depandency를 확보**하였다.
-
+#
 ## RNN/LSTM/GRU 요약
 
 - `RNN`은 다양한 길이를 가질 수 있는 **시퀀스 데이터에 특화된 딥러닝 모델**이다.
