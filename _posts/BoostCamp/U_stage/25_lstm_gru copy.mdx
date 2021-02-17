@@ -128,7 +128,11 @@ $$
 
 그러나,  LSTM(과 GRU)의 역전파는 **Cell State Vector $C_{t-1}$에 그 때 그 때 다른 값으로 이루어지는 $f_t$를 곱하고, 필요로 하는 정보 $\tilde{C_t}$ 관련 항을 더해주어 Vanishing/Exploding Gradient를 막았다.**
 
-또한, 이러한 **덧셈 연산이 역전파과정에서 Gradient를 복사하여 매번 전달해주는 역할**을 하므로,, RNN에 비해 멀리있는 timestep의 gradient까지 큰 변형없이 전달하게 되어 결과적으로 **long-term depandency를 확보**하였다.
+또한, 이러한 **덧셈 연산이 역전파과정에서 Gradient를 복사하여 매번 전달해주는 역할**을 하므로,, RNN에 비해 멀리있는 timestep의 gradient까지 큰 변형없이 전달하게 되어 결과적으로 **long-term depandency를 어느정도 확보**하였다.
+다만, LSTM과 GRU는 Long Term Dependency 문제를 완벽하게 해결하지는 못했다. 멀리 있는 정보는 곱해져 최근으로 오면서 점점 소실되게 된다.
+
+2017년 등장한 attention 구조를 활용한 transformer가 이러한 문제를 근본적으로 해결하게 되었다.
+
 #
 ## RNN/LSTM/GRU 요약
 
@@ -136,6 +140,8 @@ $$
     - 아키텍쳐 디자인에 유연성을 제공한다.
 - `Vanilla RNN`은 구조가 간단하지만 Vanishing/Exploding Gradient 문제 때문에 실제로 많이 사용되지는 않는다.
 - `LSTM`과 `GRU`는 실제 많이 사용하고 있으며, Vanishing/Exploding Gradient 문제를 **덧셈연산으로 해결한 모델**이다.
+    - `Cliping Gradient` 같은 방법으로 해결할 수도 있다고 한다.
+
 
 ---
 
