@@ -17,7 +17,7 @@ RNN의 Many-to-Many 형태에 해당한다.
 
 인코더(Encoder)와 디코더(Decoder)로 구성되어 있으며, 인코더와 디코더는 별개의 파라미터를 가진 서로 다른 RNN 모델(이미지에서는 LSTM)이다.
 
-인코더의 마지막 $h_n$은 디코더의 $h_0$가 되며, 디코더는 첫 입력으로 <SOS> 토큰을 받고, 마지막 출력으로 <EOS>토큰을 낸 뒤 생성을 마친다.
+인코더의 마지막 $h_n$은 디코더의 $h_0$가 되며, 디코더는 첫 입력으로 `<SOS>` 토큰을 받고, 마지막 출력으로 `<EOS>`토큰을 낸 뒤 생성을 마친다.
 
 따라서, 인코더의 모든 정보들은 $h_0$이라는 하나의 hidden state vector에 담겨서 디코더에 반영된다.
 
@@ -37,7 +37,7 @@ RNN의 Many-to-Many 형태에 해당한다.
 
 ### Attention Module 적용
 
-![seq2seq-with-attention]([https://3.bp.blogspot.com/-3Pbj_dvt0Vo/V-qe-Nl6P5I/AAAAAAAABQc/z0_6WtVWtvARtMk0i9_AtLeyyGyV6AI4wCLcB/s1600/nmt-model-fast.gif](https://3.bp.blogspot.com/-3Pbj_dvt0Vo/V-qe-Nl6P5I/AAAAAAAABQc/z0_6WtVWtvARtMk0i9_AtLeyyGyV6AI4wCLcB/s1600/nmt-model-fast.gif))
+![seq2seq-with-attention](https://3.bp.blogspot.com/-3Pbj_dvt0Vo/V-qe-Nl6P5I/AAAAAAAABQc/z0_6WtVWtvARtMk0i9_AtLeyyGyV6AI4wCLcB/s1600/nmt-model-fast.gif)
 
 이와 달리, attention 모듈을 활용한 Seq2Seq 모델은, $h_0$ 하나에 모든 인코더의 hidden state vector을 반영하는것이 아니라, 각 time step의 모든 $h_t$를 전부 디코더에 제공한다. 디코더는 단어를 하나씩 생성하며, 그 때 그 때 필요한 $h_t$들을 선별하여 사용하게 된다.
 
@@ -88,7 +88,7 @@ Seq2Seq with attention의 역전파 과정에서는, Encoder 단에서 잘못 �
 
 단순히 내적(dot product)을 하는 방식 외에도 Attention Scores를 구하는 다양한 방식들이 제안되었다.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/798bb12e-4fb9-45fb-91f1-9d5da2dfddc6/Screen_Shot_2021-02-17_at_1.37.44_PM.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/798bb12e-4fb9-45fb-91f1-9d5da2dfddc6/Screen_Shot_2021-02-17_at_1.37.44_PM.png)
+![attention_scores](./img/nlp/attention_scores.png)
 
 - **`generalized dot product`**
     - 디코더의 $h_t$와 인코더 중 한 단어의 hidden state vector $\bar{h}_s$를 내적하는 과정에서, 중간에 하나의 가중치행렬($W_a)$을 추가한다.
