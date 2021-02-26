@@ -1,8 +1,8 @@
 ---
 title: Graph 07 - 그래프 신경망(Graph Neural Network)
-date: 2021-02-25
+date: 2021-02-26
 tags: [BoostCamp AI Tech, Graph, Graph Neural Network, GNN, GCN, GraphSAGE, GAT, Graph Embedding, Over-smoothing, Data Augmentation]
-excerpt: 그래프를  by 신기정 교수님, BoostCamp AI Tech 5주차
+excerpt: 그래프 신경망 by 신기정 교수님, BoostCamp AI Tech 5주차
 ---
 본 정리 내용은 [Naver BoostCamp AI Tech](https://boostcamp.connect.or.kr/)의 edwith에서 학습한 내용을 정리한 것입니다.  
 사실과 다른 부분이 있거나, 수정이 필요한 사항은 댓글로 남겨주세요.
@@ -147,7 +147,13 @@ $$
 
 이 때 AGG 함수는 여러가지가 사용될 수 있다.
 
-[Untitled](https://www.notion.so/b5a56d72bb1642518513a2b214b4e458)
+| AGG 함수   | 수식                                                        | 비고                            |
+| ---------- | ----------------------------------------------------------- | ------------------------------- |
+| Mean(평균) | $$\text{AGG} = \sum_{u\in N(v)}\frac{h_u^{k-1}}{\|N(v)\|}$$ |                                 |
+| Pool(풀링) | $$AGG = \\gamma(\{Qh_u^{k-1}, \forall u \in N(v)\})$$       | $\gamma$는 원소별 최댓값을 의미 |
+| LSTM       | $$AGG = LSTM([h_u^{k-1},\forall u \in \pi(N(v))])$$         | $\pi$는 순서를 섞는다는 의미    |
+
+
 
 #
 
