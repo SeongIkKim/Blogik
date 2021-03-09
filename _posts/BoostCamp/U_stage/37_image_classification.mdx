@@ -68,6 +68,77 @@ excerpt: Image Classification by 오태현 교수님, BoostCamp AI Tech 7주차
         - 작은 필터크기임에도 불구하고, 더 깊이 층을 쌓아 receptive field의 크기를 키웠다.
     - 미리 학습된 feature를 fine-tuning하지 않고도 다른 task에 적용 가능할 정도로 일반화가 잘 되었다.
 
+AlexNet에서 VGGNet으로 발전하면서, 더 깊은 네트워크일수록 더 좋은 성능을 낸다는 것을 확인했다. 그렇다면 과연 층을 단순히 더 깊게 쌓으면, 항상 더 좋은 네트워크를 얻을 수 있을까? 물론 그렇지 않았다. 층을 깊게 쌓으면 쌓을수록 학습을 어렵게 만드는 문제들이 있었다.
+
+- **기울기 소실/폭발(Gradient vanishing/exploding)**
+- 연산 복잡도 증가(Computationally complex)
+- depth가 어느정도 깊어지면, 성능이 떨어지기 시작
+    - ~~Overfitting이 아닐까?~~ → 기울기 소실/폭발로 인한 Degradation 문제
+
+이러한 문제점들을 인식한 채로 새로운 네트워크 형태들이 등장하기 시작했다.
+
+- `GoogLeNet`
+    - ***Inception Module*** 을 여러 층 쌓는 형태를 제안한다.
+        - 하나의 층에서 다양한 크기의 필터를 사용하여 여러 측면에서 보겠다(depth 확장이 아닌 수평확장)
+        - 이 결과들은 모두 concatenation 하여 다음 층으로 넘겨주게 된다.
+        - 이 때, 1x1 conv를 한 번 적용해 채널 수를 줄여 계산 복잡도를 떨어뜨린다. 이를 병목(bottleneck) 층이라고 한다.
+            - 3x3, 5x5 conv 직전 / pooling 연산 직후
+    - ***Auxiliary classifier***
+        - 역전파 중 기울기 소실 문제를 해결하기 위해 Loss를 측정하는 Auxiliary classifier를 네트워크 중간 중간에 둔다.
+            - GoogLeNet 구조 중 Pooling 계층에서 시작해 1x1 conv → FC → FC → softmax로 Loss를 측정하는 구조이다.
+        - 역전파 시 여기에서도 역전파가 수행되고, 기존의 기울기와 결합하여 학습을 돕는다. 학습이 끝나면 제거한다.
+        - regularization 역할도 수행하는 것으로 알려져있다.
+- `ResNet`
+    - 최초로 100개가 넘는 layer를 쌓음으로써, 더 깊은 layer를 쌓을수록 성능이 더 좋아진다는 것을 보여준 첫 모델이다. 또한, 인간의 지각 능력을 뛰어넘은 첫 모델이기도 하다.
+    - 계기
+        - 네트워크 깊이를 늘리다보면 어느 순간부터 정확도(accuracy) 감소가 포화상태(saturated)에 이른다.
+        - 기존 인식(가설)
+            - 모델 파라미터가 너무 많아지면 overfitting 되어 training error가 더 적고 test error가 더 많은 결과가 나올 것이다.
+        - 실험 결과
+            - **overfitting 문제가 아니다.** training error든 test error든 더 깊은 층(56)의 네트워크가 더 얕은 층(20)의 네트워크보다 에러 수가 높게 나온다.
+            - **<U>degradation 문제이다. 기울기 소실 때문에 최적화(optimization)이 덜 되어 깊은 층의 네트워크가 학습이 덜 된 것이다!</U>**
+    - ***residual(skip) connection*** : 층이 깊어질수록 기존의 input x의 영향력(기울기)이 소실되어 충분히 학습하기 어렵다. 따라서, 몇 개의 층을 지나면 기존의 x와 동일한 값(identity)를 잔차(residual)로 더해주어, 잔여부분만 학습함으로써 학습 부담을 경감시킨다. (분할정복과 비슷한 원리)
+        - 역전파 시에도 gradient가 원래 네트워크 레이어 쪽과 skip connection 쪽 두 군데로 흐르므로, 한 곳에서 기울기 소실이 일어나더라도 다른 한쪽을 통해 학습을 정상적으로 지속할 수 있게 된다.
+        - skip connection이 한번 일어날 때마다 역전파 gradient가 흐르는 방법의 경우의 수가 2배로 늘어나므로, 전체 경우의 수는 $2^n$개가 된다.
+        - residual block은 2개의 3x3 conv layer로 이루어져 있다.
+    - 출력 직전 FC 층은 하나만 존재한다.
+
+ResNet의 등장 이후에는 ...
+
+- `DenseNet`
+    - ***Dense block*** : x identity를 그대로 더하던 ResNet의 Residual block과 달리, 각 layer의 output을 채널 축 방향으로 concatenation한다.
+        - 기울기 소실 문제 해결(Alleviate vanishing gradient problem)
+        - featrue propagation 강화
+        - feature 재활용 가능(Encourage the reuse of features) : concat으로 메모리는 더 많이 쓰게 되지만, 이전 층 layer들의 정보를 합치지 않고 그대로 보존하고 있어 필요할 때 꺼내 쓸 수 있게 된다.
+- `SENet`
+    - depth를 높이거나 connection을 사용하지 않고, 채널간의 관계를 모델링하여 중요한 특징에 Attention할 수 있도록 만드는 방법.
+    - Attention 생성 방법
+        1. **Squeeze**  : global average pooling으로 각 채널의 공간정보(H,W)를 없애고 분포(또는 magnitude)만 보게 한다.
+        2. **Excitation** : FC layer를 하나 두어 Squeeze 한 값을 통과시키면서 채널간의 연관성을 나타내는(채널을 reweighting 하는) attention score를 계산한다.
+- `EfficientNet`
+    - 기존에 네트워크 성능을 높이는 방법
+        - deep / wide / (high) resolution scaling
+            - high resolution scaling : 애초에 input 이미지의 resolution이 높으면 성능이 더 좋아진다.
+        - 그러나 세 방법은 각각 accuracy saturate의 시점이 다르다.
+    - 그래서 세 방법 모두를 적절히 섞은 compound scaling이 등장한다.
+    - 지금까지 나왔던 모든 방식들을 대상으로, 적은 FLOP에서도 압도적인 성능차를 보였다.
+- `Deformable Convolution Network`
+    - 불규칙적인 2D 이미지에 대한 convolution
+        - 사람이나 동물등의 사진은 팔다리가 어떤 형태로 있느냐에 따라 다른 모양을 가진다.
+    - 기존의 convolution 필터에 추가로 2D offset map을 추정하기 위한 branch가 따로 결합되어있다.
+        - conv 연산의 결과에 offset field를 추가시키면, offset된 feature map이 나온다.
+
+#
+이 모든 모델들은 단순히 말로는 이해하기 어려우니, 꼭 슬라이드와 논문을 참조해가면서 복습하도록 하자.
+#
+
+| 모델명    | 구조      | 메모리요구량 | 연산량    | 정확도    |      비고       |
+| --------- | --------- | ------------ | --------- | --------- | :-------------: |
+| AlexNet   | 매우 간단 | 높음         | 적음      | 낮음      |                 |
+| VGGNet    | 간단      | 높음         | 매우 높음 | 높음      |    사용 용이    |
+| GoogLeNet | 복잡      | 낮음         | 보통      | 매우 높음 | 사용하기 어려움 |
+| ResNet    | 보통      | 보통         | 보통      | 높음      |    사용 용이    |
+
 ---
 
 ### Reference
