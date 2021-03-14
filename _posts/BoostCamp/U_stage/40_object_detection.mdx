@@ -29,7 +29,7 @@ feature를 뽑아내는 부분은 사람이 직접 디자인하므로 매우 정
 
 ## Selective Search
 
-![selective-search]([https://media.geeksforgeeks.org/wp-content/uploads/home/step3-660x304.PNG](https://media.geeksforgeeks.org/wp-content/uploads/home/step3-660x304.PNG))
+![selective-search](https://media.geeksforgeeks.org/wp-content/uploads/home/step3-660x304.PNG)
 
 최근까지도 많이 사용한 기술로, 사람이나 특정 물체 뿐만 아니라, 다양한 물체 후보군의 영역 후보군을 지정해주는 방식이다. 즉, 수많은 Bounding Box(BB)를 제안해준다.
 
@@ -62,7 +62,7 @@ feature를 뽑아내는 부분은 사람이 직접 디자인하므로 매우 정
 
 따라서 R-CNN의 단점을 보완하기 위해 영상 전체에 대한 feature를 한번에 추출하고, 미리 검출된 이 feature들을 재활용하여 객체를 검출하는 **`Fast R-CNN`**이 등장했다.
 
-![fast-r-cnn]([https://www.learnopencv.com/wp-content/uploads/2019/06/frcnn.png](https://media.geeksforgeeks.org/wp-content/uploads/20200219160147/fast-RCNN1-1024x416.png))
+![fast-r-cnn]([https://www.learnopencv.com/wp-content/uploads/2019/06/frcnn.png)
 
 ### 작동방식
 
@@ -89,7 +89,7 @@ $$
 \text {IoU =}\frac{\text{Area of Overlap(교집합)}}{\text{Area of Union(합집합)}}
 $$
 
-![anchor-box]([https://www.researchgate.net/profile/Max-Ferguson/publication/327392506/figure/fig8/AS:666613162450944@1535944371721/Anchor-Boxes-at-a-certain-position-in-the-feature-map.png](https://www.researchgate.net/profile/Max-Ferguson/publication/327392506/figure/fig8/AS:666613162450944@1535944371721/Anchor-Boxes-at-a-certain-position-in-the-feature-map.png))
+![anchor-box](https://www.researchgate.net/profile/Max-Ferguson/publication/327392506/figure/fig8/AS:666613162450944@1535944371721/Anchor-Boxes-at-a-certain-position-in-the-feature-map.png](https://www.researchgate.net/profile/Max-Ferguson/publication/327392506/figure/fig8/AS:666613162450944@1535944371721/Anchor-Boxes-at-a-certain-position-in-the-feature-map.png)
 
 `Anchor boxes`는 각 위치에서 발생할 것 같은 box를 미리 rough하게 정의해놓은(pre-defined) 후보군이다. 위치마다, 크기마다 미리 정해놓은 box들을 가져다 붙이며 쓴다. 그 중 IoU가 0.7을 넘어가는 anchor box의 경우 positive sample, 즉 정답으로 간주하고, 0.3을 넘어가지 않는 box는 negative sample로 두고 penalty를 주도록 학습했다. box의 개수와 종류는 하이퍼파라미터이지만, Faster R-CNN에서는 총 9개를 설정했다. 즉, BB에 어떻게 loss를 적용시킬 지 결정하는 기준이다.
 
@@ -97,7 +97,7 @@ $$
 
 시간이 오래 걸리고, 일종의 3rd-party 알고리즘이었던 Selective search 방식을 **`Region Proposal Network(RPN)`**으로 대체하였다.
 
-![faster r-cnn]([https://www.researchgate.net/profile/Giang-Son-Tran/publication/324549019/figure/fig1/AS:649929152266241@1531966593689/Faster-R-CNN-Architecture-9.png](https://www.researchgate.net/profile/Giang-Son-Tran/publication/324549019/figure/fig1/AS:649929152266241@1531966593689/Faster-R-CNN-Architecture-9.png))
+![faster r-cnn](https://www.researchgate.net/profile/Giang-Son-Tran/publication/324549019/figure/fig1/AS:649929152266241@1531966593689/Faster-R-CNN-Architecture-9.png](https://www.researchgate.net/profile/Giang-Son-Tran/publication/324549019/figure/fig1/AS:649929152266241@1531966593689/Faster-R-CNN-Architecture-9.png)
 
 1. Fast R-CNN과 마찬가지로, 영상 하나에서 나오는 feature를 미리 뽑아둔다.
 2. RPN에서 region proposal을 여러가지 제공한다.
@@ -105,7 +105,7 @@ $$
 
 ### RPN
 
-![rpn]([https://miro.medium.com/max/375/1*JDQw0RwmnIKeRABw3ZDI7Q.png](https://miro.medium.com/max/375/1*JDQw0RwmnIKeRABw3ZDI7Q.png))
+![rpn](https://miro.medium.com/max/375/1*JDQw0RwmnIKeRABw3ZDI7Q.png)
 
 conv feature map을 256D로 뽑아내면, 다음의 두 score를 만들어낸다
 
@@ -127,7 +127,7 @@ two-stage detecor와는 다르게, 정확도를 조금 포기하더라도 속도
 
 ### 작동방식
 
-![YOLO]([https://miro.medium.com/max/700/1*9nikM2b0u-m67SJpQXftKA.png](https://miro.medium.com/max/700/1*9nikM2b0u-m67SJpQXftKA.png))
+![YOLO](https://miro.medium.com/max/700/1*9nikM2b0u-m67SJpQXftKA.png)
 
 1. 이미지를 그리드로 나눈다.
 2. 각 grid에 대해서 score를 예측한다.
@@ -135,7 +135,7 @@ two-stage detecor와는 다르게, 정확도를 조금 포기하더라도 속도
     2. class score(class probability)도 따로 예측한다.
 3. 최종 결과는 NMS를 통해 확정한다.
 
-![YOLO2]([https://lilianweng.github.io/lil-log/assets/images/yolo-network-architecture.png](https://lilianweng.github.io/lil-log/assets/images/yolo-network-architecture.png))
+![YOLO2](https://lilianweng.github.io/lil-log/assets/images/yolo-network-architecture.png)
 
 S : 마지막 conv layer의 해상도
 
@@ -174,7 +174,7 @@ Cross Entropy에서 확률 term이 추가되었는데, $\gamma$는 잘 맞추었
 
 ## RetinaNet
 
-![retinanet]([https://miro.medium.com/max/2268/1*0-GVAp6WCzPMR6puuaYQTQ.png](https://miro.medium.com/max/2268/1*0-GVAp6WCzPMR6puuaYQTQ.png))
+![retinanet](https://miro.medium.com/max/2268/1*0-GVAp6WCzPMR6puuaYQTQ.png)
 
 Low level의 특징 layer들과 High level의 특징을 둘 다 잘 활용하면서도 각 scale별로 물체를 잘 찾기위한 multi scale구조로 만들어졌다. 
 
